@@ -1,5 +1,6 @@
 package com.github.milomarten.dice.term;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
@@ -10,7 +11,7 @@ import java.util.Optional;
 public enum CoinFlipTerm implements DiceMathTerm {
     COIN_FLIP("C"), HEADS("H"), TAILS("T");
 
-    private final String letter;
+    @Getter private final String letter;
 
     @Override
     public BigDecimal asNumber() {

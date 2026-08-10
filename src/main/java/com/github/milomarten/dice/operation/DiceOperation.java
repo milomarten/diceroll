@@ -100,7 +100,7 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
             } else {
                 die = new NDie(numSides);
             }
-            var resultant = new DieResultTerm(die, die.roll(numDiceInt, options));
+            var resultant = new DieResultTerm(die, numDice, die.roll(numDiceInt, options));
 
             return new ValueAndExpression<>(resultant, this, List.of(numDice, numSides));
         }

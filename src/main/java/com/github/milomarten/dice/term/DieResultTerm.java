@@ -17,7 +17,7 @@ public final class DieResultTerm extends PoolTerm {
     private boolean canExplode = true;
     private boolean canReroll = true;
 
-    public DieResultTerm(Die<ValueAndExpression<DiceMathTerm>> die, List<ValueAndExpression<DiceMathTerm>> rolls) {
+    public DieResultTerm(Die<ValueAndExpression<DiceMathTerm>> die, ValueAndExpression<DiceMathTerm> numDice, List<ValueAndExpression<DiceMathTerm>> rolls) {
         this.die = die;
         this.pool.addAll(rolls.stream()
                 .map(MarkedRoll::new)

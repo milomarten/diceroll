@@ -10,7 +10,7 @@ class DiceExpressionParserTest {
 
     @Test
     public void test() {
-        var result = EVAL.evaluate("5d10+20");
+        var result = EVAL.evaluate("5d{10}+3");
 
         System.out.println(result);
     }

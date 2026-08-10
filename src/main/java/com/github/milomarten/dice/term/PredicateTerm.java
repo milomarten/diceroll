@@ -2,6 +2,7 @@ package com.github.milomarten.dice.term;
 
 import com.github.milomarten.evaluator.EvaluatorOptions;
 import com.github.milomarten.evaluator.ValueAndExpression;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
@@ -12,9 +13,9 @@ import java.util.function.Predicate;
 public record PredicateTerm(Comparison comparison, ValueAndExpression<DiceMathTerm> quantity) implements DiceMathTerm {
     @RequiredArgsConstructor
     public enum Comparison {
-        LE('<'), GTE('>'), EQUAL('=');
+        LE("<"), GTE(">"), EQUAL("=");
 
-        private final char symbol;
+        @Getter private final String symbol;
 
         public static Comparison read(char c) {
             return switch (c) {
@@ -30,24 +31,12 @@ public record PredicateTerm(Comparison comparison, ValueAndExpression<DiceMathTe
         this(comparison, new ValueAndExpression<>(quantity));
     }
 
-    public <T> Predicate<T> asObjIntPredicate(Function<T, Integer> mapper, EvaluatorOptions options) {
-        return switch (this.comparison) {
-            case LE -> t -> mapper.apply(t) <= quantity.value().asInteger(options);
-            case GTE -> t -> mapper.apply(t) >= quantity.value().asInteger(options);
-            case EQUAL -> t -> mapper.apply(t) == quantity.value().asInteger(options);
-        };
-    }
-
     public <T> Predicate<T> asObjBigDecimalPredicate(Function<T, BigDecimal> mapper) {
         return switch (this.comparison) {
             case LE -> t -> mapper.apply(t).compareTo(quantity.value().asNumber()) <= 0;
             case GTE -> t -> mapper.apply(t).compareTo(quantity.value().asNumber()) >= 0;
             case EQUAL -> t -> Objects.equals(mapper.apply(t), quantity.value().asNumber());
         };
-    }
-
-    public String asString() {
-        return comparison.symbol + quantity.toString();
     }
 
     @Override

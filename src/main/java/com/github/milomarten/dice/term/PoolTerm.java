@@ -16,6 +16,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
 public sealed class PoolTerm implements DiceMathTerm permits DieResultTerm {
@@ -59,6 +60,27 @@ public sealed class PoolTerm implements DiceMathTerm permits DieResultTerm {
                 .filter(mr -> !mr.dropped)
                 .count() == 1;
     }
+
+//    public String format(DiceExpressionFormatter formatter) {
+//        var p = pool.stream()
+//                .map(mr -> {
+//                    var base = formatter.formatTerm(mr.roll.value());
+//                    if (mr.exploded > 0) {
+//                        base = "\uD83D\uDCA5".repeat(mr.exploded) + base;
+//                    }
+//                    if (mr.dropped) {
+//                        base = "~~" + CROSSOUTS.matcher(base).replaceAll("") + "~~";
+//                    }
+//                    return base;
+//                })
+//                .collect(Collectors.joining(
+//                        ", ", "{", "}"
+//                ));
+//        if (totalingStrategy.isNumber(pool)) {
+//            p += "->" + totalingStrategy.totalUp(pool);
+//        }
+//        return p;
+//    }
 
     @Override
     public DiceMathTerm drop(boolean lowest, ValueAndExpression<DiceMathTerm> quantity, EvaluatorOptions options) {
