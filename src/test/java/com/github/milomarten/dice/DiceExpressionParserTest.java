@@ -10,7 +10,7 @@ class DiceExpressionParserTest {
 
     @Test
     public void test() {
-        var expression = "5d(H,1 ,3,10)";
+        var expression = "d(1,3,5)";
         var finished = e.evaluate(expression);
 
         System.out.println(finished.s());

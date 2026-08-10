@@ -36,9 +36,9 @@ public class ExpressionEvaluator<T extends Term> {
             var previousOperation = operators.isEmpty() ? null : operators.peek();
             var rightTerm = (previousOperation != null && previousOperation.isOperation()) ? previousOperation.getOperation().getImplicitRightTerm() : null;
             if (rightTerm != null) {
-                this.terms.pushInternal(rightTerm, "");
+                this.terms.pushInternal(new ValueAndExpression<>(rightTerm, ""));
             } else if (leftTerm != null) {
-                this.terms.pushInternal(leftTerm, "");
+                this.terms.pushInternal(new ValueAndExpression<>(leftTerm, ""));
             } else {
                 throw new ExpressionSyntaxError("Missing term for operator " + operator);
             }
@@ -50,7 +50,7 @@ public class ExpressionEvaluator<T extends Term> {
                 operators.peek().getPriority() <= operator.getPriority()) {
             underneath = operators.pop().getOperation();
             var result = underneath.evaluate(terms, this.options);
-            this.terms.pushInternal(result.value(), result.s());
+            this.terms.pushInternal(result);
         }
 
         operators.push(new OperationWrapper<>(operator));
@@ -72,7 +72,7 @@ public class ExpressionEvaluator<T extends Term> {
             if (rightTerm == null) {
                 throw new ExpressionSyntaxError("Unfinished operation");
             } else {
-                this.terms.pushInternal(rightTerm, "");
+                this.terms.pushInternal(new ValueAndExpression<>(rightTerm, ""));
             }
         }
 
@@ -81,13 +81,13 @@ public class ExpressionEvaluator<T extends Term> {
                 operators.peek().isOperation()) {
             underneath = operators.pop().getOperation();
             var result = underneath.evaluate(terms, this.options);
-            this.terms.pushInternal(result.value(), result.s());
+            this.terms.pushInternal(result);
         }
         var assumedParenthesis = operators.peek();
         if (assumedParenthesis instanceof ExpressionEvaluator.ParenthesisWrapper<T> par) {
             if (Objects.equals(right, par.oper.getRightBound())) {
                 var result = par.oper.evaluate(terms, options);
-                this.terms.pushInternal(result.value(), result.s());
+                this.terms.pushInternal(result);
                 operators.pop();
                 expectingTerm = false;
                 return;
@@ -103,7 +103,7 @@ public class ExpressionEvaluator<T extends Term> {
             if (rightTerm == null) {
                 throw new ExpressionSyntaxError("Unfinished operation");
             } else {
-                this.terms.pushInternal(rightTerm, "");
+                this.terms.pushInternal(new ValueAndExpression<>(rightTerm, ""));
             }
         }
 
@@ -113,7 +113,7 @@ public class ExpressionEvaluator<T extends Term> {
                 throw new ExpressionSyntaxError("Mismatched parenthesis");
             }
             var result = op.evaluate(terms, this.options);
-            this.terms.pushInternal(result.value(), result.s());
+            this.terms.pushInternal(result);
         }
 
         if (terms.size() != 1) {

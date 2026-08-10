@@ -7,6 +7,8 @@ import com.github.milomarten.evaluator.EvaluatorOptions;
 import com.github.milomarten.evaluator.TermStack;
 import com.github.milomarten.evaluator.ValueAndExpression;
 
+import java.util.List;
+
 public enum PoolOperation implements BoundedOperation<DiceMathTerm> {
     INSTANCE;
 
@@ -27,7 +29,7 @@ public enum PoolOperation implements BoundedOperation<DiceMathTerm> {
             return contents;
         } else {
             var pool = new PoolTerm(contents);
-            return new ValueAndExpression<>(pool, pool.asString());
+            return new ValueAndExpression<>(pool, pool.asString(), this, List.of(contents));
         }
     }
 }

@@ -10,9 +10,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Optional;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Getter
@@ -58,8 +56,6 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
      * This one's for you, Grapha
      */
     ROOT("√", 6) {
-        private static final DiceMathTerm TWO = new NumberTerm(BigDecimal.TWO);
-
         @Override
         public ValueAndExpression<DiceMathTerm> evaluate(TermStack<DiceMathTerm> termStack, EvaluatorOptions options) {
             return evaluateTwoParameterFunc(termStack, options, "index", "radicand", DiceMathTerm::root);
@@ -67,7 +63,7 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
 
         @Override
         public DiceMathTerm getImplicitLeftTerm() {
-            return TWO;
+            return ImplicitNumberTerm.TWO;
         }
     },
     COMMA(",", 20) {
@@ -78,10 +74,12 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
 
             if (numberOrPool.value() instanceof PoolTerm pt) {
                 pt.addToPool(newEntry);
-                return new ValueAndExpression<>(pt, pt.asString());
+                var newChildren = new ArrayList<>(numberOrPool.children());
+                newChildren.add(newEntry);
+                return new ValueAndExpression<>(pt, pt.asString(), this, newChildren);
             } else {
                 var newPool = new PoolTerm(numberOrPool, newEntry);
-                return new ValueAndExpression<>(newPool, newPool.asString());
+                return new ValueAndExpression<>(newPool, newPool.asString(), this, List.of(numberOrPool, newEntry));
             }
         }
     },
@@ -104,12 +102,12 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
             }
             var resultant = new DieResultTerm(die, numDice, die.roll(numDiceInt, options));
 
-            return new ValueAndExpression<>(resultant, resultant.asString());
+            return new ValueAndExpression<>(resultant, resultant.asString(), this, List.of(numDice, numSides));
         }
 
         @Override
         public DiceMathTerm getImplicitLeftTerm() {
-            return new NumberTerm(BigDecimal.ONE);
+            return ImplicitNumberTerm.ONE;
         }
     },
     DROP_LOWEST("dl", 4) {
@@ -121,7 +119,7 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
 
         @Override
         public DiceMathTerm getImplicitRightTerm() {
-            return NumberTerm.ONE;
+            return ImplicitNumberTerm.ONE;
         }
     },
     DROP_HIGHEST("dh", 4) {
@@ -133,7 +131,7 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
 
         @Override
         public DiceMathTerm getImplicitRightTerm() {
-            return NumberTerm.ONE;
+            return ImplicitNumberTerm.ONE;
         }
     },
     KEEP_LOWEST("kl", 4) {
@@ -145,7 +143,7 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
 
         @Override
         public DiceMathTerm getImplicitRightTerm() {
-            return NumberTerm.ONE;
+            return ImplicitNumberTerm.ONE;
         }
     },
     KEEP_HIGHEST("kh", 4) {
@@ -157,7 +155,7 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
 
         @Override
         public DiceMathTerm getImplicitRightTerm() {
-            return NumberTerm.ONE;
+            return ImplicitNumberTerm.ONE;
         }
     },
     EXPLODE("!", 4) {
@@ -219,7 +217,7 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
         var total = operator.compute(one.value(), two.value(), options);
         var asString = "(" + one.s() + " " + symbol + " " + two.s() + ")";
 
-        return new ValueAndExpression<>(total, asString);
+        return new ValueAndExpression<>(total, asString, this, List.of(one, two));
     }
 
     protected ValueAndExpression<DiceMathTerm> evaluateTwoParameterDiceFunc(TermStack<DiceMathTerm> stack, EvaluatorOptions options, String firstTerm, String secondTerm,
@@ -228,7 +226,7 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
         var one = DiceOperation.pull(stack, firstTerm);
         var total = operator.compute(one.value(), two, options);
 
-        return new ValueAndExpression<>(total, total.asString());
+        return new ValueAndExpression<>(total, total.asString(), this, List.of(one, two));
     }
 
     public static Optional<DiceOperation> findBestPossibleMatch(String op) {
@@ -244,6 +242,6 @@ interface TermOperator<T> {
 }
 
 @FunctionalInterface
-interface DiceTermOperator<T> {
+interface DiceTermOperator<T extends Term> {
     T compute(T first, ValueAndExpression<T> other, EvaluatorOptions opts);
 }

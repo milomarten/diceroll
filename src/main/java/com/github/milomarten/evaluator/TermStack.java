@@ -42,11 +42,11 @@ public class TermStack<T extends Term> {
             }
         }
 
-        pushInternal(term, term.asString());
+        pushInternal(new ValueAndExpression<>(term, term.asString()));
     }
 
-    void pushInternal(T term, String asString) {
-        this.stack.push(new ValueAndExpression<>(term, asString));
+    void pushInternal(ValueAndExpression<T> expression) {
+        this.stack.push(expression);
     }
 
     /**
