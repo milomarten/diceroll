@@ -40,11 +40,6 @@ public class NDie implements Die<ValueAndExpression<DiceMathTerm>> {
     }
 
     private ValueAndExpression<DiceMathTerm> fromInt(int i) {
-        return new ValueAndExpression<>(new NumberTerm(BigDecimal.valueOf(i)), Integer.toString(i));
-    }
-
-    @Override
-    public String asString() {
-        return "d" + numFaces.s();
+        return new ValueAndExpression<>(new NumberTerm(BigDecimal.valueOf(i)));
     }
 }

@@ -7,11 +7,6 @@ public record ImplicitNumberTerm(BigDecimal number) implements DiceMathTerm {
     public static final ImplicitNumberTerm TWO = new ImplicitNumberTerm(BigDecimal.TWO);
 
     @Override
-    public String asString() {
-        return "";
-    }
-
-    @Override
     public BigDecimal asNumber() {
         return number;
     }

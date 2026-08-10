@@ -27,7 +27,7 @@ public record PredicateTerm(Comparison comparison, ValueAndExpression<DiceMathTe
     }
 
     public PredicateTerm(Comparison comparison, DiceMathTerm quantity) {
-        this(comparison, new ValueAndExpression<>(quantity, quantity.asString()));
+        this(comparison, new ValueAndExpression<>(quantity));
     }
 
     public <T> Predicate<T> asObjIntPredicate(Function<T, Integer> mapper, EvaluatorOptions options) {
@@ -47,7 +47,7 @@ public record PredicateTerm(Comparison comparison, ValueAndExpression<DiceMathTe
     }
 
     public String asString() {
-        return comparison.symbol + quantity.s();
+        return comparison.symbol + quantity.toString();
     }
 
     @Override

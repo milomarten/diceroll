@@ -7,12 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class ExpressionEvaluatorTest {
     private static final BoundedOperation<NumberTerm> PARENTHESIS = new BoundedOperation.Brackets<>('(', ')');
 
-    private record NumberTerm(int integer) implements Term {
-        @Override
-        public String asString() {
-            return Integer.toString(integer);
-        }
-    }
+    private record NumberTerm(int integer) implements Term { }
 
     private static class Add implements Operation<NumberTerm> {
         @Override
@@ -20,8 +15,7 @@ class ExpressionEvaluatorTest {
             var term2 = termStack.pop();
             var term1 = termStack.pop();
             var sum = term1.value().integer + term2.value().integer;
-            var sumString = "(" + term1.s() + " + " + term2.s() + ")";
-            return new ValueAndExpression<>(new NumberTerm(sum), sumString);
+            return new ValueAndExpression<>(new NumberTerm(sum));
         }
 
         @Override
@@ -36,8 +30,7 @@ class ExpressionEvaluatorTest {
             var term2 = termStack.pop();
             var term1 = termStack.pop();
             var sum = term1.value().integer * term2.value().integer;
-            var sumString = "(" + term1.s() + " * " + term2.s() + ")";
-            return new ValueAndExpression<>(new NumberTerm(sum), sumString);
+            return new ValueAndExpression<>(new NumberTerm(sum));
         }
 
         @Override
@@ -55,7 +48,6 @@ class ExpressionEvaluatorTest {
 
         var finished = evaluator.finish();
         assertEquals(7, finished.value().integer);
-        assertEquals("(5 + 2)", finished.s());
     }
 
     @Test
@@ -69,7 +61,6 @@ class ExpressionEvaluatorTest {
 
         var finished = evaluator.finish();
         assertEquals(10, finished.value().integer);
-        assertEquals("((5 + 2) + 3)", finished.s());
     }
 
     @Test
@@ -85,7 +76,6 @@ class ExpressionEvaluatorTest {
 
         var finished = evaluator.finish();
         assertEquals(10, finished.value().integer);
-        assertEquals("(5 + (2 + 3))", finished.s());
     }
 
     @Test
@@ -137,7 +127,6 @@ class ExpressionEvaluatorTest {
 
         var finished = evaluator.finish();
         assertEquals(11, finished.value().integer);
-        assertEquals("(5 + (2 * 3))", finished.s());
     }
 
     @Test
@@ -153,6 +142,5 @@ class ExpressionEvaluatorTest {
 
         var finished = evaluator.finish();
         assertEquals(21, finished.value().integer);
-        assertEquals("((5 + 2) * 3)", finished.s());
     }
 }

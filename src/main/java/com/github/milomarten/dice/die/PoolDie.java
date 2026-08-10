@@ -48,9 +48,4 @@ public class PoolDie implements Die<ValueAndExpression<DiceMathTerm>> {
                 .map(mr -> mr.roll)
                 .orElseThrow(() -> new ExpressionSyntaxError("No possible values in the pool"));
     }
-
-    @Override
-    public String asString() {
-        return "d" + poolTerm.asString();
-    }
 }

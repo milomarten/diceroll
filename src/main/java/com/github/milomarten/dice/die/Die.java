@@ -7,5 +7,4 @@ import java.util.List;
 public interface Die<T> {
     List<T> roll(int qty, EvaluatorOptions options);
     T getMaxValue(EvaluatorOptions options);
-    String asString();
 }

@@ -6,14 +6,5 @@ package com.github.milomarten.evaluator;
  * Term.
  */
 public interface Term {
-    /**
-     * Get this term as a string.
-     * I do this instead of toString, since toString may contain info for debugging.
-     * The result of calling this method should be something client-friendly.
-     * By default, this simply calls toString, for convenience.
-     * @return This term as a friendly string
-     */
-    default String asString() {
-        return toString();
-    }
+
 }

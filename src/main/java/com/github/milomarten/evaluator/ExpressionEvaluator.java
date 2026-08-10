@@ -36,9 +36,9 @@ public class ExpressionEvaluator<T extends Term> {
             var previousOperation = operators.isEmpty() ? null : operators.peek();
             var rightTerm = (previousOperation != null && previousOperation.isOperation()) ? previousOperation.getOperation().getImplicitRightTerm() : null;
             if (rightTerm != null) {
-                this.terms.pushInternal(new ValueAndExpression<>(rightTerm, ""));
+                this.terms.pushInternal(new ValueAndExpression<>(rightTerm));
             } else if (leftTerm != null) {
-                this.terms.pushInternal(new ValueAndExpression<>(leftTerm, ""));
+                this.terms.pushInternal(new ValueAndExpression<>(leftTerm));
             } else {
                 throw new ExpressionSyntaxError("Missing term for operator " + operator);
             }
@@ -72,7 +72,7 @@ public class ExpressionEvaluator<T extends Term> {
             if (rightTerm == null) {
                 throw new ExpressionSyntaxError("Unfinished operation");
             } else {
-                this.terms.pushInternal(new ValueAndExpression<>(rightTerm, ""));
+                this.terms.pushInternal(new ValueAndExpression<>(rightTerm));
             }
         }
 
@@ -103,7 +103,7 @@ public class ExpressionEvaluator<T extends Term> {
             if (rightTerm == null) {
                 throw new ExpressionSyntaxError("Unfinished operation");
             } else {
-                this.terms.pushInternal(new ValueAndExpression<>(rightTerm, ""));
+                this.terms.pushInternal(new ValueAndExpression<>(rightTerm));
             }
         }
 

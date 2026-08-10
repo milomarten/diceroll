@@ -29,7 +29,7 @@ public enum PoolOperation implements BoundedOperation<DiceMathTerm> {
             return contents;
         } else {
             var pool = new PoolTerm(contents);
-            return new ValueAndExpression<>(pool, pool.asString(), this, List.of(contents));
+            return new ValueAndExpression<>(pool, this, List.of(contents));
         }
     }
 }

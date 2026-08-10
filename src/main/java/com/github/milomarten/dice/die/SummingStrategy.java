@@ -19,27 +19,6 @@ public class SummingStrategy implements TotalingStrategy<ValueAndExpression<Dice
     }
 
     @Override
-    public String totalUpString(List<MarkedRoll<ValueAndExpression<DiceMathTerm>>> rolls) {
-        var str = rolls.stream()
-                .map(mr -> {
-                    var string = mr.roll.s();
-                    if (mr.exploded > 0) {
-                        string = "\uD83D\uDCA5".repeat(mr.exploded) + string;
-                    }
-                    if (mr.dropped) {
-                        // To avoid attempting to cross-out a crossout, remove previous ones and rewrap.
-                        string = "~~" + CROSSOUTS.matcher(string).replaceAll("") + "~~";
-                    }
-                    return string;
-                })
-                .collect(Collectors.joining(", ", "\uD83C\uDFB2(", ")"));
-        if (isNumber(rolls)) {
-            str += "\uD83E\uDC62" + totalUp(rolls);
-        }
-        return str;
-    }
-
-    @Override
     public boolean isNumber(List<MarkedRoll<ValueAndExpression<DiceMathTerm>>> markedRolls) {
         return markedRolls.stream()
                 .filter(mr -> !mr.dropped)

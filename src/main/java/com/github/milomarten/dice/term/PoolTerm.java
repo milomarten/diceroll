@@ -26,7 +26,6 @@ public sealed class PoolTerm implements DiceMathTerm permits DieResultTerm {
 
     @Getter protected final List<MarkedRoll<ValueAndExpression<DiceMathTerm>>> pool;
 
-    protected String operationsString = "";
     protected boolean canDropOrKeep = true;
 
     protected TotalingStrategy<ValueAndExpression<DiceMathTerm>> totalingStrategy = new PoolStrategy<>();
@@ -62,11 +61,6 @@ public sealed class PoolTerm implements DiceMathTerm permits DieResultTerm {
     }
 
     @Override
-    public String asString() {
-        return operationsString + totalingStrategy.totalUpString(this.pool);
-    }
-
-    @Override
     public DiceMathTerm drop(boolean lowest, ValueAndExpression<DiceMathTerm> quantity, EvaluatorOptions options) {
         if (!canDropOrKeep) {
             throw new ExpressionSyntaxError("Can only drop or keep once");
@@ -78,7 +72,6 @@ public sealed class PoolTerm implements DiceMathTerm permits DieResultTerm {
                 .limit(quantity.value().asInteger(options))
                 .forEach(mr -> mr.dropped = true);
 
-        this.operationsString += "d" + (lowest ? "l" : "h") + quantity.s();
         this.canDropOrKeep = false;
         return this;
     }
@@ -98,7 +91,6 @@ public sealed class PoolTerm implements DiceMathTerm permits DieResultTerm {
                     .forEach(mr -> mr.dropped = true);
         }
 
-        this.operationsString += "k" + (lowest ? "l" : "h") + quantity.s();
         this.canDropOrKeep = false;
         return this;
     }
@@ -111,7 +103,6 @@ public sealed class PoolTerm implements DiceMathTerm permits DieResultTerm {
 
         Predicate<MarkedRoll<ValueAndExpression<DiceMathTerm>>> p = parseTermIntoPredicate(predicate, options);
 
-        this.operationsString += "c" + predicate.s();
         this.totalingStrategy = new CountingStrategy(p);
 
         return this;
@@ -126,7 +117,6 @@ public sealed class PoolTerm implements DiceMathTerm permits DieResultTerm {
 
             Predicate<MarkedRoll<ValueAndExpression<DiceMathTerm>>> p = parseTermIntoPredicate(predicate, options);
 
-            this.operationsString += "f" + predicate.s();
             cs.setFailurePredicate(p);
 
             return this;

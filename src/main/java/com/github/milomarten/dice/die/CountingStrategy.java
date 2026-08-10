@@ -34,28 +34,6 @@ public class CountingStrategy implements TotalingStrategy<ValueAndExpression<Dic
     }
 
     @Override
-    public String totalUpString(List<MarkedRoll<ValueAndExpression<DiceMathTerm>>> rolls) {
-        return rolls.stream()
-                .map(mr -> {
-                    var string = mr.roll.s();
-                    if (mr.exploded > 0) {
-                        string = "\uD83D\uDCA5".repeat(mr.exploded) + string;
-                    }
-                    if (mr.dropped) {
-                        string = "~~" + string + "~~";
-                    } else {
-                        if (successPredicate.test(mr)) {
-                            string = "✔" + string;
-                        } else if (failurePredicate != null && failurePredicate.test(mr)) {
-                            string = "X" + string;
-                        }
-                    }
-                    return string;
-                })
-                .collect(Collectors.joining(", ", "\uD83C\uDFB2(", ")\uD83E\uDC62" + totalUp(rolls)));
-    }
-
-    @Override
     public boolean isNumber(List<MarkedRoll<ValueAndExpression<DiceMathTerm>>> markedRolls) {
         return true; // counting will *always* turn into a number
     }

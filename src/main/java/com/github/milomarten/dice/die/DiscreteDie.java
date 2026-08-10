@@ -19,7 +19,7 @@ public class DiscreteDie implements Die<ValueAndExpression<DiceMathTerm>> {
     public DiscreteDie(char letter, DiceMathTerm... options) {
         this.letter = letter;
         this.possibilities = Arrays.stream(options)
-                .map(dm -> new ValueAndExpression<>(dm, dm.asString()))
+                .map(ValueAndExpression::new)
                 .toList();
     }
 
@@ -34,10 +34,5 @@ public class DiscreteDie implements Die<ValueAndExpression<DiceMathTerm>> {
     @Override
     public ValueAndExpression<DiceMathTerm> getMaxValue(EvaluatorOptions options) {
         throw new ExpressionSyntaxError("No maximum value possible for a coin flip or fate die");
-    }
-
-    @Override
-    public String asString() {
-        return "d" + letter;
     }
 }

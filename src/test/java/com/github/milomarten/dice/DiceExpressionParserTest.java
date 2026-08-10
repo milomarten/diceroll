@@ -5,17 +5,13 @@ import com.github.milomarten.parsing.StringExpressionEvaluator;
 import org.junit.jupiter.api.Test;
 
 class DiceExpressionParserTest {
-    private static final StringExpressionEvaluator<DiceMathTerm> e =
+    public static final StringExpressionEvaluator<DiceMathTerm> EVAL =
             new StringExpressionEvaluator<>(new DiceExpressionParser());
 
     @Test
     public void test() {
-        var expression = "d(1,3,5)";
-        var finished = e.evaluate(expression);
+        var result = EVAL.evaluate("5d10+20");
 
-        System.out.println(finished.s());
-        if (finished.value().isNumber()) {
-            System.out.println("\t= " + finished.value().asNumber());
-        }
+        System.out.println(result);
     }
 }

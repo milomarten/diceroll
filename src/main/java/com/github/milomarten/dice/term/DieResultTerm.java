@@ -5,7 +5,6 @@ import com.github.milomarten.evaluator.EvaluatorOptions;
 import com.github.milomarten.evaluator.ExpressionSyntaxError;
 import com.github.milomarten.evaluator.ValueAndExpression;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -13,32 +12,17 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public final class DieResultTerm extends PoolTerm {
-//    private static final Comparator<MarkedRoll<ValueAndExpression<DiceMathTerm>>> COMPARING_LOWEST = Comparator.comparing(mr -> mr.roll.value().asNumber());
-//    private static final Comparator<MarkedRoll<ValueAndExpression<DiceMathTerm>>> COMPARING_HIGHEST = Comparator.comparing(mr -> mr.roll.value().asNumber().negate());
-
     private final Die<ValueAndExpression<DiceMathTerm>> die;
-    private final ValueAndExpression<DiceMathTerm> numDice;
-//    private final List<MarkedRoll<ValueAndExpression<DiceMathTerm>>> rolls;
 
-//    private String operationsString = "";
-//    private boolean canDropOrKeep = true;
     private boolean canExplode = true;
     private boolean canReroll = true;
 
-//    private TotalingStrategy<ValueAndExpression<DiceMathTerm>> totalingStrategy = new SummingStrategy();
-
-    public DieResultTerm(Die<ValueAndExpression<DiceMathTerm>> die, ValueAndExpression<DiceMathTerm> numDice, List<ValueAndExpression<DiceMathTerm>> rolls) {
+    public DieResultTerm(Die<ValueAndExpression<DiceMathTerm>> die, List<ValueAndExpression<DiceMathTerm>> rolls) {
         this.die = die;
-        this.numDice = numDice;
         this.pool.addAll(rolls.stream()
                 .map(MarkedRoll::new)
                 .collect(Collectors.toCollection(ArrayList::new)));
-    }
-
-    @Override
-    public String asString() {
-        var poolStr = totalingStrategy.totalUpString(this.pool);
-        return "{" + numDice.s() + die.asString() + operationsString + "\uD83E\uDC62" + poolStr + "}";
+        this.totalingStrategy = new SummingStrategy();
     }
 
     @Override
@@ -54,7 +38,6 @@ public final class DieResultTerm extends PoolTerm {
 
         var p = parseTermIntoPredicate(predicate, options);
 
-        this.operationsString += "!" + predicate.s();
         doRecursiveExplode(1, pool, p, options);
         this.canExplode = false;
         return this;
@@ -90,7 +73,6 @@ public final class DieResultTerm extends PoolTerm {
 
         var p = parseTermIntoPredicate(predicate, options);
 
-        this.operationsString += "r" + predicate.s();
         doRecursiveReroll(1, pool, p, options);
         canReroll = false;
 
@@ -105,7 +87,6 @@ public final class DieResultTerm extends PoolTerm {
 
         var p = parseTermIntoPredicate(predicate, options);
 
-        this.operationsString += "r" + predicate.s();
         doRecursiveReroll(100, pool, p, options);
         canReroll = false;
 

@@ -42,7 +42,7 @@ public class TermStack<T extends Term> {
             }
         }
 
-        pushInternal(new ValueAndExpression<>(term, term.asString()));
+        pushInternal(new ValueAndExpression<>(term));
     }
 
     void pushInternal(ValueAndExpression<T> expression) {

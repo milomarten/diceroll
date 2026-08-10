@@ -27,9 +27,4 @@ public enum CoinFlipTerm implements DiceMathTerm {
                 .filter(cft -> cft.letter.charAt(0) == c)
                 .findFirst();
     }
-
-    @Override
-    public String asString() {
-        return letter;
-    }
 }

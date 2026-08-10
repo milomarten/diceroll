@@ -76,10 +76,10 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
                 pt.addToPool(newEntry);
                 var newChildren = new ArrayList<>(numberOrPool.children());
                 newChildren.add(newEntry);
-                return new ValueAndExpression<>(pt, pt.asString(), this, newChildren);
+                return new ValueAndExpression<>(pt, this, newChildren);
             } else {
                 var newPool = new PoolTerm(numberOrPool, newEntry);
-                return new ValueAndExpression<>(newPool, newPool.asString(), this, List.of(numberOrPool, newEntry));
+                return new ValueAndExpression<>(newPool, this, List.of(numberOrPool, newEntry));
             }
         }
     },
@@ -100,9 +100,9 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
             } else {
                 die = new NDie(numSides);
             }
-            var resultant = new DieResultTerm(die, numDice, die.roll(numDiceInt, options));
+            var resultant = new DieResultTerm(die, die.roll(numDiceInt, options));
 
-            return new ValueAndExpression<>(resultant, resultant.asString(), this, List.of(numDice, numSides));
+            return new ValueAndExpression<>(resultant, this, List.of(numDice, numSides));
         }
 
         @Override
@@ -215,9 +215,8 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
         var two = DiceOperation.pull(stack, secondTerm);
         var one = DiceOperation.pull(stack, firstTerm);
         var total = operator.compute(one.value(), two.value(), options);
-        var asString = "(" + one.s() + " " + symbol + " " + two.s() + ")";
 
-        return new ValueAndExpression<>(total, asString, this, List.of(one, two));
+        return new ValueAndExpression<>(total, this, List.of(one, two));
     }
 
     protected ValueAndExpression<DiceMathTerm> evaluateTwoParameterDiceFunc(TermStack<DiceMathTerm> stack, EvaluatorOptions options, String firstTerm, String secondTerm,
@@ -226,7 +225,7 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
         var one = DiceOperation.pull(stack, firstTerm);
         var total = operator.compute(one.value(), two, options);
 
-        return new ValueAndExpression<>(total, total.asString(), this, List.of(one, two));
+        return new ValueAndExpression<>(total,  this, List.of(one, two));
     }
 
     public static Optional<DiceOperation> findBestPossibleMatch(String op) {

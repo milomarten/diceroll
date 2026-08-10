@@ -7,13 +7,6 @@ import java.math.BigDecimal;
  * @param number The number, as a BigDecimal
  */
 public record NumberTerm(BigDecimal number) implements DiceMathTerm {
-    public static final NumberTerm ONE = new NumberTerm(BigDecimal.ONE);
-
-    @Override
-    public String asString() {
-        return number.toString();
-    }
-
     @Override
     public BigDecimal asNumber() {
         return number;
