@@ -7,8 +7,8 @@ import com.github.milomarten.dice.die.TotalingStrategy;
 import com.github.milomarten.evaluator.EvaluatorOptions;
 import com.github.milomarten.evaluator.ExpressionSyntaxError;
 import com.github.milomarten.evaluator.ValueAndExpression;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import com.github.milomarten.formatting.ExpressionFormatter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -16,9 +16,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
-import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public sealed class PoolTerm implements DiceMathTerm permits DieResultTerm {
     public static final Comparator<MarkedRoll<ValueAndExpression<DiceMathTerm>>> LOWEST_FIRST =
             Comparator.comparing(mr -> mr.roll.value().asNumber());
@@ -29,7 +30,7 @@ public sealed class PoolTerm implements DiceMathTerm permits DieResultTerm {
 
     protected boolean canDropOrKeep = true;
 
-    protected TotalingStrategy<ValueAndExpression<DiceMathTerm>> totalingStrategy = new PoolStrategy<>();
+    protected TotalingStrategy<DiceMathTerm> totalingStrategy = new PoolStrategy<>();
 
     public PoolTerm() {
         this.pool = new ArrayList<>();
@@ -82,20 +83,34 @@ public sealed class PoolTerm implements DiceMathTerm permits DieResultTerm {
 //        return p;
 //    }
 
+    protected List<MarkedRoll<ValueAndExpression<DiceMathTerm>>> copyPool() {
+        return pool.stream()
+                .map(mr -> new MarkedRoll<>(mr.roll, mr.dropped, mr.exploded))
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    protected PoolTerm create(
+            List<MarkedRoll<ValueAndExpression<DiceMathTerm>>> pool,
+            boolean canDropOrKeep,
+            TotalingStrategy<DiceMathTerm> totalingStrategy) {
+        return new PoolTerm(pool, canDropOrKeep, totalingStrategy);
+    }
+
     @Override
     public DiceMathTerm drop(boolean lowest, ValueAndExpression<DiceMathTerm> quantity, EvaluatorOptions options) {
         if (!canDropOrKeep) {
             throw new ExpressionSyntaxError("Can only drop or keep once");
         }
-        var comparator = lowest ?
-                LOWEST_FIRST : HIGHEST_FIRST;
-        pool.stream()
+
+        var comparator = lowest ? LOWEST_FIRST : HIGHEST_FIRST;
+
+        var newPool = copyPool();
+        newPool.stream()
                 .sorted(comparator)
                 .limit(quantity.value().asInteger(options))
                 .forEach(mr -> mr.dropped = true);
 
-        this.canDropOrKeep = false;
-        return this;
+        return create(newPool, false, totalingStrategy);
     }
 
     @Override
@@ -103,18 +118,17 @@ public sealed class PoolTerm implements DiceMathTerm permits DieResultTerm {
         if (!canDropOrKeep) {
             throw new ExpressionSyntaxError("Can only drop or keep once");
         }
-        var comparator = lowest ?
-                HIGHEST_FIRST : LOWEST_FIRST;
+        var comparator = lowest ? HIGHEST_FIRST : LOWEST_FIRST;
         var limit = pool.size() - quantity.value().asInteger(options);
+        var newPool = copyPool();
         if (limit > 0) {
-            pool.stream()
+            newPool.stream()
                     .sorted(comparator)
                     .limit(limit)
                     .forEach(mr -> mr.dropped = true);
         }
 
-        this.canDropOrKeep = false;
-        return this;
+        return create(newPool, false, totalingStrategy);
     }
 
     @Override
@@ -125,9 +139,7 @@ public sealed class PoolTerm implements DiceMathTerm permits DieResultTerm {
 
         Predicate<MarkedRoll<ValueAndExpression<DiceMathTerm>>> p = parseTermIntoPredicate(predicate, options);
 
-        this.totalingStrategy = new CountingStrategy(p);
-
-        return this;
+        return create(copyPool(), canDropOrKeep, new CountingStrategy(p));
     }
 
     @Override
@@ -139,10 +151,7 @@ public sealed class PoolTerm implements DiceMathTerm permits DieResultTerm {
 
             Predicate<MarkedRoll<ValueAndExpression<DiceMathTerm>>> p = parseTermIntoPredicate(predicate, options);
 
-            cs.setFailurePredicate(p);
-
-            return this;
-
+            return create(copyPool(), canDropOrKeep, new CountingStrategy(cs.getSuccessPredicate(), p));
         } else {
             throw new ExpressionSyntaxError("Must target success before failure");
         }
@@ -156,5 +165,9 @@ public sealed class PoolTerm implements DiceMathTerm permits DieResultTerm {
                     .anyMatch(mr -> Objects.equals(roll.roll.value(), mr.roll.value()));
             default -> roll -> Objects.equals(roll.roll.value(), predicate.value());
         };
+    }
+
+    public String format(ExpressionFormatter<DiceMathTerm> f) {
+        return totalingStrategy.formatSummary(f, pool);
     }
 }

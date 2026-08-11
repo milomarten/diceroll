@@ -3,11 +3,16 @@ package com.github.milomarten.dice.die;
 import com.github.milomarten.dice.term.DiceMathTerm;
 import com.github.milomarten.evaluator.ExpressionSyntaxError;
 import com.github.milomarten.evaluator.ValueAndExpression;
+import com.github.milomarten.formatting.ExpressionFormatter;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
-public class PoolStrategy<T extends DiceMathTerm> implements TotalingStrategy<ValueAndExpression<T>> {
+public class PoolStrategy<T extends DiceMathTerm> implements TotalingStrategy<T> {
+    private static final Pattern CROSSOUTS = Pattern.compile("~~");
+
     @Override
     public BigDecimal totalUp(List<MarkedRoll<ValueAndExpression<T>>> markedRolls) {
         var validRolls = markedRolls
@@ -26,5 +31,21 @@ public class PoolStrategy<T extends DiceMathTerm> implements TotalingStrategy<Va
         return markedRolls.stream()
                 .filter(mr -> !mr.dropped)
                 .count() == 1;
+    }
+
+    @Override
+    public String formatSummary(ExpressionFormatter<T> formatter, List<MarkedRoll<ValueAndExpression<T>>> rolls) {
+        return rolls.stream()
+                .map(mr -> {
+                    var str = formatter.formatTerm(mr.roll);
+                    if (mr.exploded > 0) {
+                        str = "\uD83D\uDCA5".repeat(mr.exploded) + str;
+                    }
+                    if (mr.dropped) {
+                        str = "~~" + CROSSOUTS.matcher(str).replaceAll("") + "~~";
+                    }
+                    return str;
+                })
+                .collect(Collectors.joining(",", "{", "}"));
     }
 }

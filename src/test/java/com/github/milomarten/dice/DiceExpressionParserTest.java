@@ -1,6 +1,7 @@
 package com.github.milomarten.dice;
 
 import com.github.milomarten.dice.term.DiceMathTerm;
+import com.github.milomarten.formatting.LineByLineFormatter;
 import com.github.milomarten.parsing.StringExpressionEvaluator;
 import org.junit.jupiter.api.Test;
 
@@ -10,8 +11,15 @@ class DiceExpressionParserTest {
 
     @Test
     public void test() {
-        var result = EVAL.evaluate("5d{10}+3");
+        var expr = "5dCsT";
+        var result = EVAL.evaluate(expr);
+        var formatted = LineByLineFormatter.format(result);
 
-        System.out.println(result);
+        System.out.println(expr);
+        formatted.forEach(line -> System.out.println("- " + line));
+
+        if (result.value().isNumber()) {
+            System.out.println("= " + result.value().asNumber());
+        }
     }
 }
