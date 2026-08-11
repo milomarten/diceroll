@@ -3,6 +3,7 @@ package com.github.milomarten.dice.die;
 import com.github.milomarten.dice.term.DiceMathTerm;
 import com.github.milomarten.evaluator.EvaluatorOptions;
 import com.github.milomarten.evaluator.ExpressionSyntaxError;
+import org.apache.commons.rng.UniformRandomProvider;
 
 import java.util.Arrays;
 import java.util.List;
@@ -17,21 +18,21 @@ import java.util.stream.IntStream;
  * die is for non-numeric options.
  */
 public class DiscreteDie implements Die<DiceMathTerm> {
-    private static final Random RANDOM = new Random();
-
     private final List<DiceMathTerm> possibilities;
+    private final UniformRandomProvider random;
 
-    public DiscreteDie(DiceMathTerm... options) {
+    public DiscreteDie(UniformRandomProvider random, DiceMathTerm... options) {
         if (options.length == 0) {
             throw new ExpressionSyntaxError("No options passed to DiscreteDie");
         }
+        this.random = random;
         this.possibilities = Arrays.asList(options);
     }
 
     @Override
     public List<DiceMathTerm> roll(int qty, EvaluatorOptions options) {
         return IntStream.range(0, qty)
-                .map(i -> RANDOM.nextInt(0, possibilities.size()))
+                .map(i -> random.nextInt(0, possibilities.size()))
                 .mapToObj(possibilities::get)
                 .toList();
     }

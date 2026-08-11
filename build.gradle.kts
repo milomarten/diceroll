@@ -11,6 +11,8 @@ repositories {
 }
 
 dependencies {
+    implementation("org.apache.commons:commons-rng-simple:1.7")
+
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 }

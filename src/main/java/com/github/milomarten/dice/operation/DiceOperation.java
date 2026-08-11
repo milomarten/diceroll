@@ -123,11 +123,11 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
 
             Die<DiceMathTerm> die;
             if (numSides.value() instanceof PoolTerm pool && !(pool instanceof DieResultTerm)) {
-                die = new PoolDie(pool);
+                die = new PoolDie(pool, options.getRandomSource());
             } else if (numSides.value() instanceof CoinFlipTerm) {
-                die = new DiscreteDie(CoinFlipTerm.HEADS, CoinFlipTerm.TAILS);
+                die = new DiscreteDie(options.getRandomSource(), CoinFlipTerm.HEADS, CoinFlipTerm.TAILS);
             } else {
-                die = new NDie(numSides.value().asInteger(options));
+                die = new NDie(numSides.value().asInteger(options), options.getRandomSource());
             }
             var resultant = new DieResultTerm(die, numDice.value(), die.roll(numDiceInt, options));
 

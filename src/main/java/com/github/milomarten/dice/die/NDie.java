@@ -5,6 +5,7 @@ import com.github.milomarten.dice.term.NumberTerm;
 import com.github.milomarten.evaluator.EvaluatorOptions;
 import com.github.milomarten.evaluator.ExpressionSyntaxError;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.rng.UniformRandomProvider;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -17,19 +18,19 @@ import java.util.stream.IntStream;
  * of returning.
  */
 public class NDie implements Die<DiceMathTerm> {
-    private static final Random RANDOM = new Random();
-
     private final int numFaces;
+    private final UniformRandomProvider random;
 
     /**
      * Create a die with some number of faces
      * Having a non-positive number of faces is an error.
      * @param numFaces The number of faces
      */
-    public NDie(int numFaces) {
+    public NDie(int numFaces, UniformRandomProvider random) {
         if (numFaces < 1) {
             throw new ExpressionSyntaxError("Num faces on dice < 1");
         }
+        this.random = random;
         this.numFaces = numFaces;
     }
 
@@ -39,7 +40,7 @@ public class NDie implements Die<DiceMathTerm> {
             throw new ExpressionSyntaxError("Num times rolling dice < 0");
         }
         return IntStream.range(0, numTimes)
-                .map(i -> 1 + RANDOM.nextInt(0, numFaces))
+                .map(i -> 1 + random.nextInt(0, numFaces))
                 .boxed()
                 .map(this::fromInt)
                 .toList();

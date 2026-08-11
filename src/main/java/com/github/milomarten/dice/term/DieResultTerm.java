@@ -82,7 +82,7 @@ public final class DieResultTerm extends PoolTerm {
                     .collect(Collectors.toCollection(ArrayList::new));
             this.pool.addAll(newRolls);
 
-            if (loopNum <= 20) {
+            if (loopNum <= options.getMaximumExplodes()) {
                 doRecursiveExplode(loopNum + 1, newRolls, predicate, options);
             }
         }
@@ -111,7 +111,7 @@ public final class DieResultTerm extends PoolTerm {
         var p = parseTermIntoPredicate(predicate, options);
 
         var newTerm = new DieResultTerm(die, numDice, copyPool(), canDropOrKeep, canExplode, false, totalingStrategy);
-        newTerm.doRecursiveReroll(100, newTerm.pool, p, options);
+        newTerm.doRecursiveReroll(options.getMaximumRerolls() + 1, newTerm.pool, p, options);
 
         return newTerm;
     }
@@ -132,7 +132,7 @@ public final class DieResultTerm extends PoolTerm {
                     .collect(Collectors.toCollection(ArrayList::new));
             this.pool.addAll(newRolls);
 
-            if (loopNum <= 20) {
+            if (loopNum <= options.getMaximumRerolls()) {
                 doRecursiveReroll(loopNum + 1, newRolls, predicate, options);
             }
         }
