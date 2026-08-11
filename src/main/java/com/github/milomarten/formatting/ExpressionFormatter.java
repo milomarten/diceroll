@@ -21,9 +21,10 @@ public interface ExpressionFormatter<T extends Term> {
     /**
      * Format an operation into a string
      * @param o The operation to format
+     * @param operatedTerms The terms under operation
      * @return The result
      */
-    String formatOperation(Operation<T> o);
+    String formatOperation(Operation<T> o, List<String> operatedTerms);
 
     /**
      * Format a bounded operation into a string

@@ -7,6 +7,7 @@ import com.github.milomarten.evaluator.Operation;
 import com.github.milomarten.formatting.ExpressionFormatter;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class DiceResultFormatter implements ExpressionFormatter<DiceMathTerm> {
     @Override
@@ -22,9 +23,11 @@ public class DiceResultFormatter implements ExpressionFormatter<DiceMathTerm> {
     }
 
     @Override
-    public String formatOperation(Operation<DiceMathTerm> o) {
+    public String formatOperation(Operation<DiceMathTerm> o, List<String> operatedTerms) {
         if (o instanceof DiceOperation d) {
-            return d.getSymbol();
+            var symbol = d.getSymbol();
+            return operatedTerms.stream()
+                    .collect(Collectors.joining(symbol, "(", ")"));
         }
         return "#";
     }

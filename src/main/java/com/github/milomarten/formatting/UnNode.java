@@ -36,9 +36,8 @@ class UnNode<T extends Term> {
      * Format this node's children, and itself
      * For leaf UnNodes (nodes with no children), this.string becomes the
      * result of calling the formatter's formatTerm() method. For non-leafs
-     * with an Operation, this.string becomes the result of joining each child string
-     * with the result of the formatter's formatOperation() method. For non-leafs
-     * with a BoundedOperation, this.string becomes the result of the formatter's
+     * with an Operation, this.string becomes the result of calling either formatOperation
+     * or formatBoundedOperation with the children's strings.
      * formatBoundedOperation() method, with the children nodes all passed in as one list.
      * @param formatter The formatter to use.
      */
@@ -48,9 +47,7 @@ class UnNode<T extends Term> {
         } else {
             children.forEach(n -> n.format(formatter));
             if (value.operation() instanceof Operation<?> o) {
-                string = children.stream()
-                        .map(n -> n.string)
-                        .collect(Collectors.joining(formatter.formatOperation((Operation<T>) o), "(", ")"));
+                string = formatter.formatOperation((Operation<T>) o, children.stream().map(UnNode::getString).toList());
             } else if (value.operation() instanceof BoundedOperation<?> bo) {
                 string = formatter.formatBoundedOperation((BoundedOperation<T>) bo, children.stream().map(UnNode::getString).toList());
             }
