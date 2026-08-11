@@ -13,13 +13,9 @@ class DiceExpressionParserTest {
     public void test() {
         var expr = "(2d6+2)*(d10+1)";
         var result = EVAL.evaluate(expr);
-        var formatted = LineByLineFormatter.format(result);
+        var formatted = LineByLineFormatter.format(result, new DiceResultFormatter());
 
         System.out.println(expr);
         formatted.forEach(line -> System.out.println("- " + line));
-
-//        if (result.value().isNumber()) {
-//            System.out.println("= " + result.value().asNumber());
-//        }
     }
 }

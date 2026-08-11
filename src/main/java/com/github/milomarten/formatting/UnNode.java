@@ -13,15 +13,35 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * A Node class used for facilitating the LineByLineFormatter.
+ * This node contains two operations which, in tandem, give an output for each step of an Evaluation.
+ * 1. format() computes the string field for every node. The string of a leaf node is simply its value, while branches
+ * are formatted as a combination of the operation and its children's string field. Thus, each node's string is
+ * based on its children's string.
+ * 2. pullUp() trims all the leaves, potentially leaving new leaves in their stead.
+ * Each successive call to pullUp() simplifies the tree, and the result of format() goes from showing the operation
+ * (when it's a branch) to the result of the operation (when it's a leaf). When the root has no children, only the final
+ * answer remains.
+ * @param <T> The term type
+ */
 @RequiredArgsConstructor
 @ToString
-public class UnNode<T extends Term> {
-    private final int level;
-    @ToString.Exclude private final UnNode<T> parent;
+class UnNode<T extends Term> {
     @ToString.Exclude private final ValueAndExpression<T> value;
     @Getter @Setter private String string = "";
     @Getter private final List<UnNode<T>> children = new ArrayList<>();
 
+    /**
+     * Format this node's children, and itself
+     * For leaf UnNodes (nodes with no children), this.string becomes the
+     * result of calling the formatter's formatTerm() method. For non-leafs
+     * with an Operation, this.string becomes the result of joining each child string
+     * with the result of the formatter's formatOperation() method. For non-leafs
+     * with a BoundedOperation, this.string becomes the result of the formatter's
+     * formatBoundedOperation() method, with the children nodes all passed in as one list.
+     * @param formatter The formatter to use.
+     */
     public void format(ExpressionFormatter<T> formatter) {
         if (isLeaf()) {
             string = formatter.formatTerm(value.value());
@@ -37,6 +57,10 @@ public class UnNode<T extends Term> {
         }
     }
 
+    /**
+     * Shrink this tree by one level.
+     * Any node only containing leaves as children have the children removed.
+     */
     public void pullUp() {
         if (children.stream().allMatch(UnNode::isLeaf)) {
             children.clear();
@@ -45,6 +69,10 @@ public class UnNode<T extends Term> {
         }
     }
 
+    /**
+     * Check if this node is a leaf
+     * @return True, if this node has no children
+     */
     public boolean isLeaf() {
         return children.isEmpty();
     }

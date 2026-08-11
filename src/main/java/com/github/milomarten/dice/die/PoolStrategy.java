@@ -9,6 +9,13 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+/**
+ * A semi-numerical strategy used to represent a pool
+ * totalUp only returns a value if there is one, and only one, non-dropped roll that can be
+ * expressed as a number. In all other cases, an ExpressionSyntaxError is thrown.
+ * This is the default strategy for pools.
+ * @param <T>
+ */
 public class PoolStrategy<T extends DiceMathTerm> implements TotalingStrategy<T> {
     private static final Pattern CROSSOUTS = Pattern.compile("~~");
 

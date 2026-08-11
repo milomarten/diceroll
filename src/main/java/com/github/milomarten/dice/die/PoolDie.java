@@ -9,6 +9,12 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.IntStream;
 
+/**
+ * A dice which has a Pool of possibly non-numeric options
+ * Each option in the pool is equally likely to be returned. Within the pool itself, any possible term
+ * type is supported.
+ * getMaxValue will throw an exception only if any non-dropped term is the pool is non-numeric.
+ */
 public class PoolDie implements Die<DiceMathTerm> {
     private static final Random RANDOM = new Random();
 

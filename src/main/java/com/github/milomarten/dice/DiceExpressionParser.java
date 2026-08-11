@@ -12,6 +12,16 @@ import com.github.milomarten.evaluator.ExpressionSyntaxError;
 import com.github.milomarten.parsing.BasicExpressionParser;
 import com.github.milomarten.parsing.ShrinkingString;
 
+/**
+ * A parser for parsing diceroll strings
+ * Terms supported:
+ * - any decimal number,
+ * - the letters C, H, and T (which represent coin flips)
+ * - The characters =, &lt;, and &gt;, followed by a number, which represents a predicate
+ * Operations supported:
+ * - Bounded Operator &#123;&#125;, for constructing Pools
+ * - All Operators found in DiceOperation
+ */
 public class DiceExpressionParser extends BasicExpressionParser<DiceMathTerm> {
     @Override
     protected DiceMathTerm stringToTerm(ShrinkingString string, EvaluatorOptions options) {

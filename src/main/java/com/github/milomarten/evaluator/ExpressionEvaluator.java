@@ -6,6 +6,14 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Objects;
 
+/**
+ * Supports programmatic expression evaluation.
+ * Terms can be combined with Operations, in the same order as standard
+ * infix notation. Order of operations is respected, and enforcement of order between
+ * terms and operations.
+ * If anything unexpected is present, an ExpressionSyntaxError is thrown and processing halts.
+ * @param <T> The type of term
+ */
 public class ExpressionEvaluator<T extends Term> {
     private final TermStack<T> terms;
     private final Deque<OperationOrParenthesis<T>> operators = new LinkedList<>();
@@ -22,6 +30,10 @@ public class ExpressionEvaluator<T extends Term> {
         this(EvaluatorOptions.builder().build());
     }
 
+    /**
+     * Push a term to the stack.
+     * @param term The term to push
+     */
     public void push(T term) {
         if (!expectingTerm) {
             throw new ExpressionSyntaxError("Was not expecting term " + term);
@@ -30,6 +42,17 @@ public class ExpressionEvaluator<T extends Term> {
         this.expectingTerm = false;
     }
 
+    /**
+     * Push an Operation to the stack
+     * Pushing an Operation may result in the stack changing, as operations with
+     * lower priority are activated and new terms are calculated.
+     * <br>
+     * Some operators support implicit left or right terms, if none are specified. If an Operator is pushed
+     * and a term was expected, it checks the previous operations implicit right term (if exists), and the
+     * pushed operator's implicit left term. If either exist, that term is pushed first. If both exist, the
+     * implicit right Operator takes precedence
+     * @param operator The operator to push
+     */
     public void push(Operation<T> operator) {
         if (expectingTerm) {
             var leftTerm = operator.getImplicitLeftTerm();
@@ -54,9 +77,15 @@ public class ExpressionEvaluator<T extends Term> {
         }
 
         operators.push(new OperationWrapper<>(operator));
-        expectingTerm = operator.expectTermAfter();
+        expectingTerm = true;
     }
 
+    /**
+     * Push the start of a bounded operation.
+     * The start of a bounded operation acts like a Term, and so can be used whenever you would
+     * push a Term.
+     * @param boundedOperation The BoundedOperation
+     */
     public void pushBoundedOperationStart(BoundedOperation<T> boundedOperation) {
         if (expectingTerm) {
             operators.push(new ParenthesisWrapper<>(boundedOperation));
@@ -65,6 +94,15 @@ public class ExpressionEvaluator<T extends Term> {
         }
     }
 
+    /**
+     * Push the end of a bounded operation.
+     * The stack is popped and evaluated until the matching BoundedOperation is found. In contrast with the
+     * BoundedOperationStart, the end of a bounded operation acts like an Operation, and can be used whenever
+     * an Operation is expected.
+     * An ExpressionSyntaxError is thrown if no matching BoundedOperation is found, or if an unmatched
+     * BoundedOperation is found instead.
+     * @param right The right-bound character.
+     */
     public void pushBoundedOperationEnd(String right) {
         if (expectingTerm) {
             var previousOperation = operators.isEmpty() ? null : operators.peek();
@@ -96,6 +134,12 @@ public class ExpressionEvaluator<T extends Term> {
         throw new ExpressionSyntaxError("Mismatched parenthesis");
     }
 
+    /**
+     * Complete evaluation and return the final answer
+     * The operation stack is popped until there's only one term remaining. This
+     * can be done at any time the Evaluator expects an operation.
+     * @return The result of evaluating the Expression
+     */
     public ValueAndExpression<T> finish() {
         if (expectingTerm) {
             var previousOperation = operators.isEmpty() ? null : operators.peek();

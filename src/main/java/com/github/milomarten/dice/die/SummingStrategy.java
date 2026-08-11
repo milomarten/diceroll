@@ -8,6 +8,12 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+/**
+ * A strategy to sum up all rolls based on face value
+ * All non-dropped rolls are summed together. totalUp will fail if any of the rolls
+ * cannot be coerced into a number.
+ * This is the default strategy for dice rolls.
+ */
 public class SummingStrategy implements TotalingStrategy<DiceMathTerm> {
     private static final Pattern CROSSOUTS = Pattern.compile("~~");
 

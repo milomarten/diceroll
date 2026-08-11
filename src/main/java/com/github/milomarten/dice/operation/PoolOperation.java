@@ -9,6 +9,13 @@ import com.github.milomarten.evaluator.ValueAndExpression;
 
 import java.util.List;
 
+/**
+ * A BoundedOperation for creating Pools
+ * Strictly speaking, this is not necessary; the comma operator (,)
+ * will automatically create a pool of length 2 or more. However, this operation
+ * is the only way to make a pool of length 1. The curly brace syntax is also easier to read
+ * compared to using square brackets or parenthesis.
+ */
 public enum PoolOperation implements BoundedOperation<DiceMathTerm> {
     INSTANCE;
 

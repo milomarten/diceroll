@@ -32,17 +32,6 @@ public interface Operation<T extends Term> {
     int getPriority();
 
     /**
-     * Whether a term should or should not be expected after this Operation
-     * This allows for the creation of a postfix operator, such as factorial (!). For such a postfix
-     * operator, this function should return false.
-     * Since binary operators are more common than postfix, this function defaults to true.
-     * @return True if a Term should follow this Operation, False if another Operation can follow.
-     */
-    default boolean expectTermAfter() {
-        return true;
-    }
-
-    /**
      * Get an implicit left term of this operation.
      * Some Operations have an assumed "left" term. As an example, √ implicitly assumes the square root, so the
      * assumed left term would be 2 if none is otherwise specified.

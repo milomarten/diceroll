@@ -11,23 +11,35 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.IntStream;
 
-@RequiredArgsConstructor
+/**
+ * A dice which outputs 1 to n as an option
+ * Represents your usual polyhedral dice, any value from 1 to numFaces has equal likelihood
+ * of returning.
+ */
 public class NDie implements Die<DiceMathTerm> {
     private static final Random RANDOM = new Random();
 
-    private final DiceMathTerm numFaces;
+    private final int numFaces;
+
+    /**
+     * Create a die with some number of faces
+     * Having a non-positive number of faces is an error.
+     * @param numFaces The number of faces
+     */
+    public NDie(int numFaces) {
+        if (numFaces < 1) {
+            throw new ExpressionSyntaxError("Num faces on dice < 1");
+        }
+        this.numFaces = numFaces;
+    }
 
     @Override
     public List<DiceMathTerm> roll(int numTimes, EvaluatorOptions options) {
         if (numTimes < 0) {
             throw new ExpressionSyntaxError("Num times rolling dice < 0");
         }
-        var numFacesInt = getMaxValue(options).asInteger(options);
-        if (numFacesInt < 1) {
-            throw new ExpressionSyntaxError("Num faces on dice < 1");
-        }
         return IntStream.range(0, numTimes)
-                .map(i -> 1 + RANDOM.nextInt(0, numFacesInt))
+                .map(i -> 1 + RANDOM.nextInt(0, numFaces))
                 .boxed()
                 .map(this::fromInt)
                 .toList();
@@ -35,7 +47,7 @@ public class NDie implements Die<DiceMathTerm> {
 
     @Override
     public DiceMathTerm getMaxValue(EvaluatorOptions options) {
-        return fromInt(numFaces.asInteger(options));
+        return fromInt(numFaces);
     }
 
     private DiceMathTerm fromInt(int i) {

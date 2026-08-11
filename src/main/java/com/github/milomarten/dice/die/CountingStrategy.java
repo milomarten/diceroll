@@ -13,6 +13,16 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+/**
+ * A strategy to count the number of rolls matching a predicate.
+ * Of the non-dropped rolls, the result of totalUp is the number
+ * of rolls that match the success predicate, minus the number
+ * of rolls that match the failure predicate (if present).
+ * Once the TARGET_SUCCESS dice operation is used, the strategy is changed to
+ * this one.
+ * totalUp will always return a number, since the predicate does not depend
+ * on term type.
+ */
 @RequiredArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -27,13 +37,14 @@ public class CountingStrategy implements TotalingStrategy<DiceMathTerm> {
         return rolls.stream()
                 .filter(mr -> !mr.dropped)
                 .map(mr -> {
+                    var counter = BigDecimal.ZERO;
                     if (successPredicate.test(mr)) {
-                        return BigDecimal.ONE;
-                    } else if (failurePredicate != null && failurePredicate.test(mr)) {
-                        return BigDecimal.ONE.negate();
-                    } else {
-                        return BigDecimal.ZERO;
+                        counter = counter.add(BigDecimal.ONE);
                     }
+                    if (failurePredicate != null && failurePredicate.test(mr)) {
+                        counter = counter.subtract(BigDecimal.ONE);
+                    }
+                    return counter;
                 })
                 .reduce(BigDecimal.ZERO, BigDecimal::add, BigDecimal::add);
     }
@@ -53,10 +64,13 @@ public class CountingStrategy implements TotalingStrategy<DiceMathTerm> {
                     }
                     if (mr.dropped) {
                         str = "~~" + CROSSOUTS.matcher(str).replaceAll("") + "~~";
-                    } else if (successPredicate.test(mr)) {
-                        str = "✔" + str;
-                    } else if (failurePredicate != null && failurePredicate.test(mr)) {
-                        str = "X" + str;
+                    } else {
+                        if (successPredicate.test(mr)) {
+                            str = "✔" + str;
+                        }
+                        if (failurePredicate != null && failurePredicate.test(mr)) {
+                            str = "X" + str;
+                        }
                     }
                     return str;
                 })

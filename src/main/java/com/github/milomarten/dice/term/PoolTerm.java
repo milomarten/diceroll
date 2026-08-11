@@ -20,6 +20,16 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+/**
+ * A term which represents a Pool of other terms
+ * A Pool can be considered as a list or a tuple, although does not support the usual list or tuple
+ * destructuring. A Pool can only be destructured back into a number by dropping all be one item in the Pool
+ * (via KEEP or DROP), or counting successes/failures.
+ * Each operation on a Pool creates a completely new Pool, in order to support evaluation traceback.
+ * <br>
+ * Currently, it is an error to use any mathematical or most dice operator on a Pool that cannot be destructured
+ * into a number. A future enhancement may support this by distributing the operations over each element in the Pool.
+ */
 @RequiredArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public sealed class PoolTerm implements DiceMathTerm permits DieResultTerm {
@@ -59,31 +69,8 @@ public sealed class PoolTerm implements DiceMathTerm permits DieResultTerm {
 
     @Override
     public boolean isNumber() {
-        return pool.stream()
-                .filter(mr -> !mr.dropped)
-                .count() == 1;
+        return totalingStrategy.isNumber(this.pool);
     }
-
-//    public String format(DiceExpressionFormatter formatter) {
-//        var p = pool.stream()
-//                .map(mr -> {
-//                    var base = formatter.formatTerm(mr.roll.value());
-//                    if (mr.exploded > 0) {
-//                        base = "\uD83D\uDCA5".repeat(mr.exploded) + base;
-//                    }
-//                    if (mr.dropped) {
-//                        base = "~~" + CROSSOUTS.matcher(base).replaceAll("") + "~~";
-//                    }
-//                    return base;
-//                })
-//                .collect(Collectors.joining(
-//                        ", ", "{", "}"
-//                ));
-//        if (totalingStrategy.isNumber(pool)) {
-//            p += "->" + totalingStrategy.totalUp(pool);
-//        }
-//        return p;
-//    }
 
     protected List<MarkedRoll<DiceMathTerm>> copyPool() {
         return pool.stream()

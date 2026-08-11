@@ -6,6 +6,7 @@ import com.github.milomarten.dice.die.SummingStrategy;
 import com.github.milomarten.dice.die.TotalingStrategy;
 import com.github.milomarten.evaluator.EvaluatorOptions;
 import com.github.milomarten.evaluator.ExpressionSyntaxError;
+import com.github.milomarten.formatting.ExpressionFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +14,12 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+/**
+ * A term which represents the result of a dice roll
+ * Functionally, a DieResultTerm is just a Pool attached to a source of re-rollable randomness (i.e. a die).
+ * Thus, a Die can support rerolling (and, by extension, exploding) operations.
+ * Each operation on a DieResult creates a completely new DieResult, in order to support evaluation traceback.
+ */
 public final class DieResultTerm extends PoolTerm {
     private final Die<DiceMathTerm> die;
     private final DiceMathTerm numDice;
@@ -38,11 +45,6 @@ public final class DieResultTerm extends PoolTerm {
         this.canExplode = canExplode;
         this.canReroll = canReroll;
         this.totalingStrategy = totalingStrategy;
-    }
-
-    @Override
-    public boolean isNumber() {
-        return totalingStrategy.isNumber(pool);
     }
 
     @Override
@@ -144,4 +146,8 @@ public final class DieResultTerm extends PoolTerm {
         return super.parseTermIntoPredicate(predicate, options);
     }
 
+    @Override
+    public String format(ExpressionFormatter<DiceMathTerm> f) {
+        return "\uD83C\uDFB2" + super.format(f);
+    }
 }

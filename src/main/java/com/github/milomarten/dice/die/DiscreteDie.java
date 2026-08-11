@@ -9,14 +9,22 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.IntStream;
 
+/**
+ * A dice which has a discrete amount of non-numeric options
+ * This dice is most useful for coin flips or fudge dice. Each possibility
+ * is equally likely.
+ * getMaxValue will always throw an exception, since the expected use case for this
+ * die is for non-numeric options.
+ */
 public class DiscreteDie implements Die<DiceMathTerm> {
     private static final Random RANDOM = new Random();
 
-    private final char letter;
     private final List<DiceMathTerm> possibilities;
 
-    public DiscreteDie(char letter, DiceMathTerm... options) {
-        this.letter = letter;
+    public DiscreteDie(DiceMathTerm... options) {
+        if (options.length == 0) {
+            throw new ExpressionSyntaxError("No options passed to DiscreteDie");
+        }
         this.possibilities = Arrays.asList(options);
     }
 

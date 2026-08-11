@@ -3,10 +3,10 @@ package com.github.milomarten.evaluator;
 import java.util.List;
 
 /**
- * Holds a term and the String representation of that term.
- * At the "leaf" of an expression, s is simply value.asString. However
- * this is not strictly enforced, and varies based on Operation configuration.
+ * Holds a term and the subparts that compose it.
  * @param value The term
+ * @param operation The operation which created this ValueAndExpression
+ * @param children The pieces of the operation that resulted in this ValueAndExpression
  * @param <T> The type of the term
  */
 public record ValueAndExpression<T extends Term>(T value, Object operation, List<ValueAndExpression<T>> children) {
