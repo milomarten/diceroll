@@ -4,12 +4,10 @@ import com.github.milomarten.dice.term.DiceMathTerm;
 import com.github.milomarten.dice.term.NumberTerm;
 import com.github.milomarten.evaluator.EvaluatorOptions;
 import com.github.milomarten.evaluator.ExpressionSyntaxError;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.rng.UniformRandomProvider;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.IntStream;
 
 /**

@@ -2,7 +2,8 @@ package com.github.milomarten.evaluator;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ExpressionEvaluatorTest {
     private static final BoundedOperation<NumberTerm> PARENTHESIS = new BoundedOperation.Brackets<>('(', ')');
