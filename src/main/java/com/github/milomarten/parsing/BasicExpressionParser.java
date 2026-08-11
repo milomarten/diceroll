@@ -80,7 +80,6 @@ public abstract class BasicExpressionParser<T extends Term> implements TermParse
         var s = new StringBuilder();
         var signPermitted = true;
         var decimalPointPermitted = true;
-        var digitFound = false;
         while (isNumberFriendlyCharacter(string.currentChar())) {
             char c = string.currentChar();
             if (isSignCharacter(c)) {
@@ -102,17 +101,19 @@ public abstract class BasicExpressionParser<T extends Term> implements TermParse
                 // physically has to be a number
                 s.append(c);
                 signPermitted = false;
-                digitFound = true;
             }
             string.advance(1);
         }
         if (s.isEmpty()) {
             return Optional.empty();
         }
-        if (!digitFound) {
-            throw new ExpressionSyntaxError("Number is missing numbers!");
+        var result = s.toString();
+        if ("+".equals(result) || "-".equals(result)) {
+            // possibly an erroneously-read addition/subtraction sign
+            string.advance(-1);
+            return Optional.empty();
         }
-        return Optional.of(new BigDecimal(s.toString()));
+        return Optional.of(new BigDecimal(result));
     }
 
     private static boolean isNumberFriendlyCharacter(char c) {

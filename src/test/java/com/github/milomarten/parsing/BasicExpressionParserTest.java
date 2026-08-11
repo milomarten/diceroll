@@ -42,7 +42,7 @@ class BasicExpressionParserTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-        "+", ".", "++5", "1.2.3", "flop"
+        ".", "++5", "1.2.3", "flop"
     })
     public void testBadNumbers(String expression) {
         assertThrows(ExpressionSyntaxError.class, () -> {

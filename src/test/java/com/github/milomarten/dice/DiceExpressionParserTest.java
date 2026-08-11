@@ -11,15 +11,15 @@ class DiceExpressionParserTest {
 
     @Test
     public void test() {
-        var expr = "5dCsT";
+        var expr = "(2d6+2)*(d10+1)";
         var result = EVAL.evaluate(expr);
         var formatted = LineByLineFormatter.format(result);
 
         System.out.println(expr);
         formatted.forEach(line -> System.out.println("- " + line));
 
-        if (result.value().isNumber()) {
-            System.out.println("= " + result.value().asNumber());
-        }
+//        if (result.value().isNumber()) {
+//            System.out.println("= " + result.value().asNumber());
+//        }
     }
 }

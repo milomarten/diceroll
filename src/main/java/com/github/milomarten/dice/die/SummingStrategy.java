@@ -39,9 +39,11 @@ public class SummingStrategy implements TotalingStrategy<DiceMathTerm> {
                     }
                     return str;
                 })
-                .collect(Collectors.joining(",", "{", "}"));
-        if (isNumber(rolls)) {
-            pool += "->" + totalUp(rolls);
+                .collect(Collectors.joining(",", "{", ""));
+        if (isNumber(rolls) && rolls.size() > 1) {
+            pool += "=>" + totalUp(rolls) + "}";
+        } else {
+            pool += "}";
         }
         return pool;
     }
