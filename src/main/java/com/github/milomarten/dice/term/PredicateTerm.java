@@ -10,7 +10,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public record PredicateTerm(Comparison comparison, ValueAndExpression<DiceMathTerm> quantity) implements DiceMathTerm {
+public record PredicateTerm(Comparison comparison, DiceMathTerm quantity) implements DiceMathTerm {
     @RequiredArgsConstructor
     public enum Comparison {
         LE("<"), GTE(">"), EQUAL("=");
@@ -27,15 +27,11 @@ public record PredicateTerm(Comparison comparison, ValueAndExpression<DiceMathTe
         }
     }
 
-    public PredicateTerm(Comparison comparison, DiceMathTerm quantity) {
-        this(comparison, new ValueAndExpression<>(quantity));
-    }
-
     public <T> Predicate<T> asObjBigDecimalPredicate(Function<T, BigDecimal> mapper) {
         return switch (this.comparison) {
-            case LE -> t -> mapper.apply(t).compareTo(quantity.value().asNumber()) <= 0;
-            case GTE -> t -> mapper.apply(t).compareTo(quantity.value().asNumber()) >= 0;
-            case EQUAL -> t -> Objects.equals(mapper.apply(t), quantity.value().asNumber());
+            case LE -> t -> mapper.apply(t).compareTo(quantity.asNumber()) <= 0;
+            case GTE -> t -> mapper.apply(t).compareTo(quantity.asNumber()) >= 0;
+            case EQUAL -> t -> Objects.equals(mapper.apply(t), quantity.asNumber());
         };
     }
 

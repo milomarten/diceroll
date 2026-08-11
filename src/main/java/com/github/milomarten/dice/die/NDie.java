@@ -13,17 +13,17 @@ import java.util.Random;
 import java.util.stream.IntStream;
 
 @RequiredArgsConstructor
-public class NDie implements Die<ValueAndExpression<DiceMathTerm>> {
+public class NDie implements Die<DiceMathTerm> {
     private static final Random RANDOM = new Random();
 
-    private final ValueAndExpression<DiceMathTerm> numFaces;
+    private final DiceMathTerm numFaces;
 
     @Override
-    public List<ValueAndExpression<DiceMathTerm>> roll(int numTimes, EvaluatorOptions options) {
+    public List<DiceMathTerm> roll(int numTimes, EvaluatorOptions options) {
         if (numTimes < 0) {
             throw new ExpressionSyntaxError("Num times rolling dice < 0");
         }
-        var numFacesInt = getMaxValue(options).value().asInteger(options);
+        var numFacesInt = getMaxValue(options).asInteger(options);
         if (numFacesInt < 1) {
             throw new ExpressionSyntaxError("Num faces on dice < 1");
         }
@@ -35,11 +35,11 @@ public class NDie implements Die<ValueAndExpression<DiceMathTerm>> {
     }
 
     @Override
-    public ValueAndExpression<DiceMathTerm> getMaxValue(EvaluatorOptions options) {
-        return fromInt(numFaces.value().asInteger(options));
+    public DiceMathTerm getMaxValue(EvaluatorOptions options) {
+        return fromInt(numFaces.asInteger(options));
     }
 
-    private ValueAndExpression<DiceMathTerm> fromInt(int i) {
-        return new ValueAndExpression<>(new NumberTerm(BigDecimal.valueOf(i)));
+    private DiceMathTerm fromInt(int i) {
+        return new NumberTerm(BigDecimal.valueOf(i));
     }
 }

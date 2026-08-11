@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.IntStream;
 
-public class PoolDie implements Die<ValueAndExpression<DiceMathTerm>> {
+public class PoolDie implements Die<DiceMathTerm> {
     private static final Random RANDOM = new Random();
 
     private final PoolTerm poolTerm;
@@ -20,7 +20,7 @@ public class PoolDie implements Die<ValueAndExpression<DiceMathTerm>> {
     }
 
     @Override
-    public List<ValueAndExpression<DiceMathTerm>> roll(int qty, EvaluatorOptions options) {
+    public List<DiceMathTerm> roll(int qty, EvaluatorOptions options) {
         if (qty < 0) {
             throw new ExpressionSyntaxError("Num times rolling dice < 0");
         }
@@ -40,7 +40,7 @@ public class PoolDie implements Die<ValueAndExpression<DiceMathTerm>> {
     }
 
     @Override
-    public ValueAndExpression<DiceMathTerm> getMaxValue(EvaluatorOptions options) {
+    public DiceMathTerm getMaxValue(EvaluatorOptions options) {
         return poolTerm.getPool()
                 .stream()
                 .filter(mr -> !mr.dropped)

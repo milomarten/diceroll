@@ -24,7 +24,7 @@ public class UnNode<T extends Term> {
 
     public void format(ExpressionFormatter<T> formatter) {
         if (isLeaf()) {
-            string = formatter.formatTerm(value);
+            string = formatter.formatTerm(value.value());
         } else {
             children.forEach(n -> n.format(formatter));
             if (value.operation() instanceof Operation<?> o) {

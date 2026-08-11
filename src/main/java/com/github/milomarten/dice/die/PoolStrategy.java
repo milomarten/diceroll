@@ -14,27 +14,27 @@ public class PoolStrategy<T extends DiceMathTerm> implements TotalingStrategy<T>
     private static final Pattern CROSSOUTS = Pattern.compile("~~");
 
     @Override
-    public BigDecimal totalUp(List<MarkedRoll<ValueAndExpression<T>>> markedRolls) {
+    public BigDecimal totalUp(List<MarkedRoll<T>> markedRolls) {
         var validRolls = markedRolls
                 .stream()
                 .filter(mr -> !mr.dropped)
                 .toList();
         if (validRolls.size() == 1) {
-            return validRolls.getFirst().roll.value().asNumber();
+            return validRolls.getFirst().roll.asNumber();
         } else {
             throw new ExpressionSyntaxError("Tried to unwrap a pool as a number");
         }
     }
 
     @Override
-    public boolean isNumber(List<MarkedRoll<ValueAndExpression<T>>> markedRolls) {
+    public boolean isNumber(List<MarkedRoll<T>> markedRolls) {
         return markedRolls.stream()
                 .filter(mr -> !mr.dropped)
                 .count() == 1;
     }
 
     @Override
-    public String formatSummary(ExpressionFormatter<T> formatter, List<MarkedRoll<ValueAndExpression<T>>> rolls) {
+    public String formatSummary(ExpressionFormatter<T> formatter, List<MarkedRoll<T>> rolls) {
         return rolls.stream()
                 .map(mr -> {
                     var str = formatter.formatTerm(mr.roll);

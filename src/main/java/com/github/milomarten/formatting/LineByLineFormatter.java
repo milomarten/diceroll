@@ -35,15 +35,14 @@ public class LineByLineFormatter {
 
     private static class F implements ExpressionFormatter<DiceMathTerm> {
         @Override
-        public String formatTerm(ValueAndExpression<DiceMathTerm> value) {
-            return switch (value.value()) {
+        public String formatTerm(DiceMathTerm value) {
+            return switch (value) {
                 case NumberTerm nt -> nt.number().toPlainString();
                 case CoinFlipTerm ct -> ct.getLetter();
                 case PlaceholderTerm ignored -> "";
                 case ImplicitNumberTerm ignored -> "";
                 case PredicateTerm pt -> pt.comparison().getSymbol() + formatTerm(pt.quantity());
                 case PoolTerm pt -> pt.format(this);
-                default -> value.value().toString();
             };
         }
 

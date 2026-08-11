@@ -28,7 +28,7 @@ public enum PoolOperation implements BoundedOperation<DiceMathTerm> {
         if (contents.value() instanceof PoolTerm) {
             return contents;
         } else {
-            var pool = new PoolTerm(contents);
+            var pool = new PoolTerm(contents.value());
             return new ValueAndExpression<>(pool, this, List.of(contents));
         }
     }

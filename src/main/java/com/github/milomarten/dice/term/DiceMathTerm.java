@@ -87,31 +87,31 @@ public sealed interface DiceMathTerm extends Term permits CoinFlipTerm, Implicit
         }
     }
 
-    default DiceMathTerm drop(boolean lowest, ValueAndExpression<DiceMathTerm> quantity, EvaluatorOptions options) {
+    default DiceMathTerm drop(boolean lowest, DiceMathTerm quantity, EvaluatorOptions options) {
         throw new ExpressionSyntaxError("drop " + (lowest ? "lowest" : "highest") + " unsupported");
     }
 
-    default DiceMathTerm keep(boolean lowest, ValueAndExpression<DiceMathTerm> quantity, EvaluatorOptions options) {
+    default DiceMathTerm keep(boolean lowest, DiceMathTerm quantity, EvaluatorOptions options) {
         throw new ExpressionSyntaxError("keep " + (lowest ? "lowest" : "highest") + " unsupported");
     }
 
-    default DiceMathTerm explode(ValueAndExpression<DiceMathTerm> predicate, EvaluatorOptions options) {
+    default DiceMathTerm explode(DiceMathTerm predicate, EvaluatorOptions options) {
         throw new ExpressionSyntaxError("explode unsupported");
     }
 
-    default DiceMathTerm reroll(ValueAndExpression<DiceMathTerm> predicate, EvaluatorOptions options) {
+    default DiceMathTerm reroll(DiceMathTerm predicate, EvaluatorOptions options) {
         throw new ExpressionSyntaxError("reroll unsupported");
     }
 
-    default DiceMathTerm rerollOnce(ValueAndExpression<DiceMathTerm> predicate, EvaluatorOptions options) {
+    default DiceMathTerm rerollOnce(DiceMathTerm predicate, EvaluatorOptions options) {
         throw new ExpressionSyntaxError("reroll once unsupported");
     }
 
-    default DiceMathTerm targetSuccess(ValueAndExpression<DiceMathTerm> predicate, EvaluatorOptions options) {
+    default DiceMathTerm targetSuccess(DiceMathTerm predicate, EvaluatorOptions options) {
         throw new ExpressionSyntaxError("target success unsupported");
     }
 
-    default DiceMathTerm targetFailure(ValueAndExpression<DiceMathTerm> predicate, EvaluatorOptions options) {
+    default DiceMathTerm targetFailure(DiceMathTerm predicate, EvaluatorOptions options) {
         throw new ExpressionSyntaxError("target failure unsupported");
     }
 

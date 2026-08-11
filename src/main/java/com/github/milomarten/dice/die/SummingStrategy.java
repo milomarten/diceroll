@@ -13,21 +13,21 @@ public class SummingStrategy implements TotalingStrategy<DiceMathTerm> {
     private static final Pattern CROSSOUTS = Pattern.compile("~~");
 
     @Override
-    public BigDecimal totalUp(List<MarkedRoll<ValueAndExpression<DiceMathTerm>>> rolls) {
+    public BigDecimal totalUp(List<MarkedRoll<DiceMathTerm>> rolls) {
         return rolls.stream()
-                .map(mr -> mr.dropped ? BigDecimal.ZERO : mr.roll.value().asNumber())
+                .map(mr -> mr.dropped ? BigDecimal.ZERO : mr.roll.asNumber())
                 .reduce(BigDecimal.ZERO, BigDecimal::add, BigDecimal::add);
     }
 
     @Override
-    public boolean isNumber(List<MarkedRoll<ValueAndExpression<DiceMathTerm>>> markedRolls) {
+    public boolean isNumber(List<MarkedRoll<DiceMathTerm>> markedRolls) {
         return markedRolls.stream()
                 .filter(mr -> !mr.dropped)
-                .allMatch(mr -> mr.roll.value().isNumber());
+                .allMatch(mr -> mr.roll.isNumber());
     }
 
     @Override
-    public String formatSummary(ExpressionFormatter<DiceMathTerm> formatter, List<MarkedRoll<ValueAndExpression<DiceMathTerm>>> rolls) {
+    public String formatSummary(ExpressionFormatter<DiceMathTerm> formatter, List<MarkedRoll<DiceMathTerm>> rolls) {
         var pool = rolls.stream()
                 .map(mr -> {
                     var str = formatter.formatTerm(mr.roll);

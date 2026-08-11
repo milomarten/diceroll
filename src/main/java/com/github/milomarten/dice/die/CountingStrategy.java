@@ -20,11 +20,11 @@ import java.util.stream.Collectors;
 public class CountingStrategy implements TotalingStrategy<DiceMathTerm> {
     private static final Pattern CROSSOUTS = Pattern.compile("~~");
 
-    private final Predicate<MarkedRoll<ValueAndExpression<DiceMathTerm>>> successPredicate;
-    @Setter private Predicate<MarkedRoll<ValueAndExpression<DiceMathTerm>>> failurePredicate;
+    private final Predicate<MarkedRoll<DiceMathTerm>> successPredicate;
+    @Setter private Predicate<MarkedRoll<DiceMathTerm>> failurePredicate;
 
     @Override
-    public BigDecimal totalUp(List<MarkedRoll<ValueAndExpression<DiceMathTerm>>> rolls) {
+    public BigDecimal totalUp(List<MarkedRoll<DiceMathTerm>> rolls) {
         return rolls.stream()
                 .filter(mr -> !mr.dropped)
                 .map(mr -> {
@@ -40,12 +40,12 @@ public class CountingStrategy implements TotalingStrategy<DiceMathTerm> {
     }
 
     @Override
-    public boolean isNumber(List<MarkedRoll<ValueAndExpression<DiceMathTerm>>> markedRolls) {
+    public boolean isNumber(List<MarkedRoll<DiceMathTerm>> markedRolls) {
         return true; // counting will *always* turn into a number
     }
 
     @Override
-    public String formatSummary(ExpressionFormatter<DiceMathTerm> formatter, List<MarkedRoll<ValueAndExpression<DiceMathTerm>>> rolls) {
+    public String formatSummary(ExpressionFormatter<DiceMathTerm> formatter, List<MarkedRoll<DiceMathTerm>> rolls) {
         var pool = rolls.stream()
                 .map(mr -> {
                     var str = formatter.formatTerm(mr.roll);
@@ -57,7 +57,7 @@ public class CountingStrategy implements TotalingStrategy<DiceMathTerm> {
                     } else if (successPredicate.test(mr)) {
                         str = "✔" + str;
                     } else if (failurePredicate != null && failurePredicate.test(mr)) {
-                        str = "❌" + str;
+                        str = "X" + str;
                     }
                     return str;
                 })

@@ -73,12 +73,12 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
             var numberOrPool = DiceOperation.pull(termStack, "num of dice");
 
             if (numberOrPool.value() instanceof PoolTerm pt) {
-                pt.addToPool(newEntry);
+                pt.addToPool(newEntry.value());
                 var newChildren = new ArrayList<>(numberOrPool.children());
                 newChildren.add(newEntry);
                 return new ValueAndExpression<>(pt, this, newChildren);
             } else {
-                var newPool = new PoolTerm(numberOrPool, newEntry);
+                var newPool = new PoolTerm(numberOrPool.value(), newEntry.value());
                 return new ValueAndExpression<>(newPool, this, List.of(numberOrPool, newEntry));
             }
         }
@@ -92,15 +92,15 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
 
             var numDiceInt = numDice.value().asInteger(options);
 
-            Die<ValueAndExpression<DiceMathTerm>> die;
+            Die<DiceMathTerm> die;
             if (numSides.value() instanceof PoolTerm pool) {
                 die = new PoolDie(pool);
             } else if (numSides.value() instanceof CoinFlipTerm) {
                 die = new DiscreteDie('C', CoinFlipTerm.HEADS, CoinFlipTerm.TAILS);
             } else {
-                die = new NDie(numSides);
+                die = new NDie(numSides.value());
             }
-            var resultant = new DieResultTerm(die, numDice, die.roll(numDiceInt, options));
+            var resultant = new DieResultTerm(die, numDice.value(), die.roll(numDiceInt, options));
 
             return new ValueAndExpression<>(resultant, this, List.of(numDice, numSides));
         }
@@ -220,10 +220,10 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
     }
 
     protected ValueAndExpression<DiceMathTerm> evaluateTwoParameterDiceFunc(TermStack<DiceMathTerm> stack, EvaluatorOptions options, String firstTerm, String secondTerm,
-                                                                            DiceTermOperator<DiceMathTerm> operator) {
+                                                                            TermOperator<DiceMathTerm> operator) {
         var two = DiceOperation.pull(stack, secondTerm);
         var one = DiceOperation.pull(stack, firstTerm);
-        var total = operator.compute(one.value(), two, options);
+        var total = operator.compute(one.value(), two.value(), options);
 
         return new ValueAndExpression<>(total,  this, List.of(one, two));
     }
@@ -238,9 +238,4 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
 @FunctionalInterface
 interface TermOperator<T> {
     T compute(T first, T other, EvaluatorOptions opts);
-}
-
-@FunctionalInterface
-interface DiceTermOperator<T extends Term> {
-    T compute(T first, ValueAndExpression<T> other, EvaluatorOptions opts);
 }

@@ -13,13 +13,13 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public final class DieResultTerm extends PoolTerm {
-    private final Die<ValueAndExpression<DiceMathTerm>> die;
-    private final ValueAndExpression<DiceMathTerm> numDice;
+    private final Die<DiceMathTerm> die;
+    private final DiceMathTerm numDice;
 
     private boolean canExplode = true;
     private boolean canReroll = true;
 
-    public DieResultTerm(Die<ValueAndExpression<DiceMathTerm>> die, ValueAndExpression<DiceMathTerm> numDice, List<ValueAndExpression<DiceMathTerm>> rolls) {
+    public DieResultTerm(Die<DiceMathTerm> die, DiceMathTerm numDice, List<DiceMathTerm> rolls) {
         this.die = die;
         this.numDice = numDice;
         this.pool.addAll(rolls.stream()
@@ -28,7 +28,7 @@ public final class DieResultTerm extends PoolTerm {
         this.totalingStrategy = new SummingStrategy();
     }
 
-    public DieResultTerm(Die<ValueAndExpression<DiceMathTerm>> die, ValueAndExpression<DiceMathTerm> numDice, List<MarkedRoll<ValueAndExpression<DiceMathTerm>>> pool,
+    public DieResultTerm(Die<DiceMathTerm> die, DiceMathTerm numDice, List<MarkedRoll<DiceMathTerm>> pool,
                          boolean canDropOrKeep, boolean canExplode, boolean canReroll, TotalingStrategy<DiceMathTerm> totalingStrategy) {
         super(pool);
         this.die = die;
@@ -45,12 +45,12 @@ public final class DieResultTerm extends PoolTerm {
     }
 
     @Override
-    protected DieResultTerm create(List<MarkedRoll<ValueAndExpression<DiceMathTerm>>> pool, boolean canDropOrKeep, TotalingStrategy<DiceMathTerm> totalingStrategy) {
+    protected DieResultTerm create(List<MarkedRoll<DiceMathTerm>> pool, boolean canDropOrKeep, TotalingStrategy<DiceMathTerm> totalingStrategy) {
         return new DieResultTerm(die, numDice, pool, canDropOrKeep, canExplode, canReroll, totalingStrategy);
     }
 
     @Override
-    public DiceMathTerm explode(ValueAndExpression<DiceMathTerm> predicate, EvaluatorOptions options) {
+    public DiceMathTerm explode(DiceMathTerm predicate, EvaluatorOptions options) {
         if (!canExplode) {
             throw new ExpressionSyntaxError("Can only explode once");
         }
@@ -63,7 +63,7 @@ public final class DieResultTerm extends PoolTerm {
         return newTerm;
     }
 
-    private void doRecursiveExplode(int loopNum, List<MarkedRoll<ValueAndExpression<DiceMathTerm>>> mostRecentRolls, Predicate<MarkedRoll<ValueAndExpression<DiceMathTerm>>> predicate, EvaluatorOptions options) {
+    private void doRecursiveExplode(int loopNum, List<MarkedRoll<DiceMathTerm>> mostRecentRolls, Predicate<MarkedRoll<DiceMathTerm>> predicate, EvaluatorOptions options) {
         var numToExplode = mostRecentRolls.stream()
                 .filter(mr -> {
                     if (!mr.dropped && predicate.test(mr)) {
@@ -86,7 +86,7 @@ public final class DieResultTerm extends PoolTerm {
     }
 
     @Override
-    public DiceMathTerm reroll(ValueAndExpression<DiceMathTerm> predicate, EvaluatorOptions options) {
+    public DiceMathTerm reroll(DiceMathTerm predicate, EvaluatorOptions options) {
         if (!canReroll) {
             throw new ExpressionSyntaxError("Can only explode once");
         }
@@ -100,7 +100,7 @@ public final class DieResultTerm extends PoolTerm {
     }
 
     @Override
-    public DiceMathTerm rerollOnce(ValueAndExpression<DiceMathTerm> predicate, EvaluatorOptions options) {
+    public DiceMathTerm rerollOnce(DiceMathTerm predicate, EvaluatorOptions options) {
         if (!canReroll) {
             throw new ExpressionSyntaxError("Can only explode once");
         }
@@ -113,7 +113,7 @@ public final class DieResultTerm extends PoolTerm {
         return newTerm;
     }
 
-    private void doRecursiveReroll(int loopNum, List<MarkedRoll<ValueAndExpression<DiceMathTerm>>> mostRecentRolls, Predicate<MarkedRoll<ValueAndExpression<DiceMathTerm>>> predicate, EvaluatorOptions options) {
+    private void doRecursiveReroll(int loopNum, List<MarkedRoll<DiceMathTerm>> mostRecentRolls, Predicate<MarkedRoll<DiceMathTerm>> predicate, EvaluatorOptions options) {
         var numToReroll = mostRecentRolls.stream()
                 .filter(mr -> {
                     if (!mr.dropped && predicate.test(mr)) {
@@ -136,9 +136,9 @@ public final class DieResultTerm extends PoolTerm {
     }
 
     @Override
-    protected Predicate<MarkedRoll<ValueAndExpression<DiceMathTerm>>> parseTermIntoPredicate(ValueAndExpression<DiceMathTerm> predicate, EvaluatorOptions options) {
-        if (predicate.value() instanceof PlaceholderTerm) {
-            return roll -> Objects.equals(roll.roll.value(), die.getMaxValue(options).value());
+    protected Predicate<MarkedRoll<DiceMathTerm>> parseTermIntoPredicate(DiceMathTerm predicate, EvaluatorOptions options) {
+        if (predicate instanceof PlaceholderTerm) {
+            return roll -> Objects.equals(roll.roll, die.getMaxValue(options));
         }
         return super.parseTermIntoPredicate(predicate, options);
     }
