@@ -3,7 +3,6 @@ package com.github.milomarten.dice.term;
 import com.github.milomarten.evaluator.EvaluatorOptions;
 import com.github.milomarten.evaluator.ExpressionSyntaxError;
 import com.github.milomarten.evaluator.Term;
-import com.github.milomarten.evaluator.ValueAndExpression;
 
 import java.math.BigDecimal;
 import java.math.MathContext;

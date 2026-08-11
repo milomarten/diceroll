@@ -2,7 +2,6 @@ package com.github.milomarten.dice.die;
 
 
 import com.github.milomarten.evaluator.Term;
-import com.github.milomarten.evaluator.ValueAndExpression;
 import com.github.milomarten.formatting.ExpressionFormatter;
 
 import java.math.BigDecimal;

@@ -1,10 +1,11 @@
 package com.github.milomarten.dice.term;
 
-import com.github.milomarten.dice.die.*;
+import com.github.milomarten.dice.die.Die;
+import com.github.milomarten.dice.die.MarkedRoll;
+import com.github.milomarten.dice.die.SummingStrategy;
+import com.github.milomarten.dice.die.TotalingStrategy;
 import com.github.milomarten.evaluator.EvaluatorOptions;
 import com.github.milomarten.evaluator.ExpressionSyntaxError;
-import com.github.milomarten.evaluator.ValueAndExpression;
-import lombok.AllArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;

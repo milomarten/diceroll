@@ -4,7 +4,6 @@ import com.github.milomarten.dice.term.DiceMathTerm;
 import com.github.milomarten.dice.term.PoolTerm;
 import com.github.milomarten.evaluator.EvaluatorOptions;
 import com.github.milomarten.evaluator.ExpressionSyntaxError;
-import com.github.milomarten.evaluator.ValueAndExpression;
 
 import java.util.List;
 import java.util.Random;

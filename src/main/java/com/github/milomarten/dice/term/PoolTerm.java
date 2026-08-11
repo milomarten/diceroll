@@ -6,9 +6,11 @@ import com.github.milomarten.dice.die.PoolStrategy;
 import com.github.milomarten.dice.die.TotalingStrategy;
 import com.github.milomarten.evaluator.EvaluatorOptions;
 import com.github.milomarten.evaluator.ExpressionSyntaxError;
-import com.github.milomarten.evaluator.ValueAndExpression;
 import com.github.milomarten.formatting.ExpressionFormatter;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

@@ -9,7 +9,6 @@ import com.github.milomarten.evaluator.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.math.BigDecimal;
 import java.util.*;
 
 @RequiredArgsConstructor

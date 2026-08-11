@@ -1,7 +1,5 @@
 package com.github.milomarten.dice.term;
 
-import com.github.milomarten.evaluator.EvaluatorOptions;
-import com.github.milomarten.evaluator.ValueAndExpression;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

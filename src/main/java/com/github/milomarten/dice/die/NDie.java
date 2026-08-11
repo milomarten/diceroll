@@ -4,7 +4,6 @@ import com.github.milomarten.dice.term.DiceMathTerm;
 import com.github.milomarten.dice.term.NumberTerm;
 import com.github.milomarten.evaluator.EvaluatorOptions;
 import com.github.milomarten.evaluator.ExpressionSyntaxError;
-import com.github.milomarten.evaluator.ValueAndExpression;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
