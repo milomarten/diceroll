@@ -5,7 +5,6 @@ plugins {
 }
 
 group = "com.github.milomarten"
-version = "1.0"
 
 repositories {
     mavenCentral()
