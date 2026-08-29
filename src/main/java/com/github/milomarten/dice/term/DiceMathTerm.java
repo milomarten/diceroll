@@ -10,7 +10,7 @@ import java.math.MathContext;
 /**
  * The base class for any term permitted in a Dice expression
  */
-public sealed interface DiceMathTerm extends Term permits CoinFlipTerm, ImplicitNumberTerm, NumberTerm, PlaceholderTerm, PoolTerm, PredicateTerm {
+public sealed interface DiceMathTerm extends Term permits CoinFlipTerm, ImplicitNumberTerm, NumberTerm, PlaceholderTerm, AbstractPoolTerm, PredicateTerm {
     /**
      * Convert this term into a BigDecimal
      * Most DiceMathTerm can be turned into a number, but this is not

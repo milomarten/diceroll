@@ -1,6 +1,7 @@
 package com.github.milomarten.dice.operation;
 
 import com.github.milomarten.dice.term.DiceMathTerm;
+import com.github.milomarten.dice.term.AbstractPoolTerm;
 import com.github.milomarten.dice.term.PoolTerm;
 import com.github.milomarten.evaluator.BoundedOperation;
 import com.github.milomarten.evaluator.EvaluatorOptions;
@@ -32,8 +33,8 @@ public enum PoolOperation implements BoundedOperation<DiceMathTerm> {
     @Override
     public ValueAndExpression<DiceMathTerm> evaluate(TermStack<DiceMathTerm> termStack, EvaluatorOptions options) {
         var contents = termStack.pop();
-        if (contents.value() instanceof PoolTerm) {
-            return contents;
+        if (contents.value() instanceof PoolTerm pt) {
+            return new ValueAndExpression<>(pt, this, contents.children());
         } else {
             var pool = new PoolTerm(contents.value());
             return new ValueAndExpression<>(pool, this, List.of(contents));

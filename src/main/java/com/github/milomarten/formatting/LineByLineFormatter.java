@@ -37,7 +37,11 @@ public class LineByLineFormatter {
         while (!node.isLeaf()) {
             node.pullUp();
             node.format(formatter);
-            output.add(node.getString());
+
+            var next = node.getString();
+            if (!next.equals(output.getLast())) {
+                output.add(node.getString());
+            }
         }
 
         return output;

@@ -18,7 +18,7 @@ public class DiceResultFormatter implements ExpressionFormatter<DiceMathTerm> {
             case PlaceholderTerm ignored -> "";
             case ImplicitNumberTerm ignored -> "";
             case PredicateTerm pt -> pt.comparison().getSymbol() + formatTerm(pt.quantity());
-            case PoolTerm pt -> pt.format(this);
+            case AbstractPoolTerm pt -> pt.format(this);
         };
     }
 
@@ -34,6 +34,6 @@ public class DiceResultFormatter implements ExpressionFormatter<DiceMathTerm> {
 
     @Override
     public String formatBoundedOperation(BoundedOperation<DiceMathTerm> bo, List<String> contents) {
-        return bo.getLeftBound() + String.join(", ", contents) + bo.getRightBound();
+        return bo.getLeftBound() + String.join(",", contents) + bo.getRightBound();
     }
 }

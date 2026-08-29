@@ -11,7 +11,7 @@ class DiceExpressionParserTest {
 
     @Test
     public void test() {
-        var expr = "(2d6+2)*(d10+1)";
+        var expr = "1d({1,3,5,7}+2)";
         var result = EVAL.evaluate(expr);
         var formatted = LineByLineFormatter.format(result, new DiceResultFormatter());
 

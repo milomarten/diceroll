@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  * Thus, a Die can support rerolling (and, by extension, exploding) operations.
  * Each operation on a DieResult creates a completely new DieResult, in order to support evaluation traceback.
  */
-public final class DieResultTerm extends PoolTerm {
+public final class DieResultTerm extends AbstractPoolTerm {
     private final Die<DiceMathTerm> die;
     private final DiceMathTerm numDice;
 

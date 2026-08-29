@@ -1,9 +1,6 @@
 package com.github.milomarten.dice.operation;
 
-import com.github.milomarten.dice.die.Die;
-import com.github.milomarten.dice.die.DiscreteDie;
-import com.github.milomarten.dice.die.NDie;
-import com.github.milomarten.dice.die.PoolDie;
+import com.github.milomarten.dice.die.*;
 import com.github.milomarten.dice.term.*;
 import com.github.milomarten.evaluator.*;
 import lombok.Getter;
@@ -122,7 +119,7 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
             var numDiceInt = numDice.value().asInteger(options);
 
             Die<DiceMathTerm> die;
-            if (numSides.value() instanceof PoolTerm pool && !(pool instanceof DieResultTerm)) {
+            if (numSides.value() instanceof PoolTerm pool) {
                 die = new PoolDie(pool, options.getRandomSource());
             } else if (numSides.value() instanceof CoinFlipTerm) {
                 die = new DiscreteDie(options.getRandomSource(), CoinFlipTerm.HEADS, CoinFlipTerm.TAILS);
@@ -149,7 +146,7 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
     DROP_LOWEST("dl", 4) {
         @Override
         public ValueAndExpression<DiceMathTerm> evaluate(TermStack<DiceMathTerm> termStack, EvaluatorOptions options) {
-            return evaluateTwoParameterDiceFunc(termStack, options, "pool", "num to drop",
+            return evaluateTwoParameterFunc(termStack, options, "pool", "num to drop",
                     (one, two, opts) -> one.drop(true, two, options));
         }
 
@@ -168,7 +165,7 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
     DROP_HIGHEST("dh", 4) {
         @Override
         public ValueAndExpression<DiceMathTerm> evaluate(TermStack<DiceMathTerm> termStack, EvaluatorOptions options) {
-            return evaluateTwoParameterDiceFunc(termStack, options, "pool", "num to drop",
+            return evaluateTwoParameterFunc(termStack, options, "pool", "num to drop",
                     (one, two, opts) -> one.drop(false, two, options));
         }
 
@@ -187,7 +184,7 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
     KEEP_LOWEST("kl", 4) {
         @Override
         public ValueAndExpression<DiceMathTerm> evaluate(TermStack<DiceMathTerm> termStack, EvaluatorOptions options) {
-            return evaluateTwoParameterDiceFunc(termStack, options, "pool", "num to keep",
+            return evaluateTwoParameterFunc(termStack, options, "pool", "num to keep",
                     (one, two, opts) -> one.keep(true, two, options));
         }
 
@@ -206,7 +203,7 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
     KEEP_HIGHEST("kh", 4) {
         @Override
         public ValueAndExpression<DiceMathTerm> evaluate(TermStack<DiceMathTerm> termStack, EvaluatorOptions options) {
-            return evaluateTwoParameterDiceFunc(termStack, options, "pool", "num to keep",
+            return evaluateTwoParameterFunc(termStack, options, "pool", "num to keep",
                     (one, two, opts) -> one.keep(false, two, options));
         }
 
@@ -232,7 +229,7 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
     EXPLODE("!", 4) {
         @Override
         public ValueAndExpression<DiceMathTerm> evaluate(TermStack<DiceMathTerm> termStack, EvaluatorOptions options) {
-            return evaluateTwoParameterDiceFunc(termStack, options, "dice pool", "explosion predicate",
+            return evaluateTwoParameterFunc(termStack, options, "dice pool", "explosion predicate",
                     (one, two, opts) -> one.explode(two, options));
         }
 
@@ -256,7 +253,7 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
     REROLL("r", 4) {
         @Override
         public ValueAndExpression<DiceMathTerm> evaluate(TermStack<DiceMathTerm> termStack, EvaluatorOptions options) {
-            return evaluateTwoParameterDiceFunc(termStack, options, "dice pool", "reroll predicate",
+            return evaluateTwoParameterFunc(termStack, options, "dice pool", "reroll predicate",
                     (one, two, opts) -> one.reroll(two, options));
         }
     },
@@ -268,7 +265,7 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
     REROLL_ONCE("ro", 4) {
         @Override
         public ValueAndExpression<DiceMathTerm> evaluate(TermStack<DiceMathTerm> termStack, EvaluatorOptions options) {
-            return evaluateTwoParameterDiceFunc(termStack, options, "dice pool", "reroll predicate",
+            return evaluateTwoParameterFunc(termStack, options, "dice pool", "reroll predicate",
                     (one, two, opts) -> one.rerollOnce(two, options));
         }
     },
@@ -285,7 +282,7 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
     TARGET_SUCCESS("s", 4) {
         @Override
         public ValueAndExpression<DiceMathTerm> evaluate(TermStack<DiceMathTerm> termStack, EvaluatorOptions options) {
-            return evaluateTwoParameterDiceFunc(termStack, options, "pool", "success predicate",
+            return evaluateTwoParameterFunc(termStack, options, "pool", "success predicate",
                     (one, two, opts) -> one.targetSuccess(two, options));
         }
     },
@@ -304,7 +301,7 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
     TARGET_FAILURE("f", 4) {
         @Override
         public ValueAndExpression<DiceMathTerm> evaluate(TermStack<DiceMathTerm> termStack, EvaluatorOptions options) {
-            return evaluateTwoParameterDiceFunc(termStack, options, "pool", "failure predicate",
+            return evaluateTwoParameterFunc(termStack, options, "pool", "failure predicate",
                     (one, two, opts) -> one.targetFailure(two, options));
         }
     }
@@ -324,18 +321,9 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
                                                                         TermOperator<DiceMathTerm> operator) {
         var two = DiceOperation.pull(stack, secondTerm);
         var one = DiceOperation.pull(stack, firstTerm);
-        var total = operator.compute(one.value(), two.value(), options);
 
+        var total = operator.compute(one.value(), two.value(), options);
         return new ValueAndExpression<>(total, this, List.of(one, two));
-    }
-
-    protected ValueAndExpression<DiceMathTerm> evaluateTwoParameterDiceFunc(TermStack<DiceMathTerm> stack, EvaluatorOptions options, String firstTerm, String secondTerm,
-                                                                            TermOperator<DiceMathTerm> operator) {
-        var two = DiceOperation.pull(stack, secondTerm);
-        var one = DiceOperation.pull(stack, firstTerm);
-        var total = operator.compute(one.value(), two.value(), options);
-
-        return new ValueAndExpression<>(total,  this, List.of(one, two));
     }
 
     /**

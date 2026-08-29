@@ -1,7 +1,7 @@
 package com.github.milomarten.dice.die;
 
 import com.github.milomarten.dice.term.DiceMathTerm;
-import com.github.milomarten.dice.term.PoolTerm;
+import com.github.milomarten.dice.term.AbstractPoolTerm;
 import com.github.milomarten.evaluator.EvaluatorOptions;
 import com.github.milomarten.evaluator.ExpressionSyntaxError;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ import java.util.stream.IntStream;
  */
 @RequiredArgsConstructor
 public class PoolDie implements Die<DiceMathTerm> {
-    private final PoolTerm poolTerm;
+    private final AbstractPoolTerm poolTerm;
     private final UniformRandomProvider random;
 
     @Override
@@ -46,7 +46,7 @@ public class PoolDie implements Die<DiceMathTerm> {
         return poolTerm.getPool()
                 .stream()
                 .filter(mr -> !mr.dropped)
-                .max(PoolTerm.LOWEST_FIRST)
+                .max(AbstractPoolTerm.LOWEST_FIRST)
                 .map(mr -> mr.roll)
                 .orElseThrow(() -> new ExpressionSyntaxError("No possible values in the pool"));
     }
