@@ -2,10 +2,7 @@ package com.github.milomarten.dice;
 
 import com.github.milomarten.dice.operation.DiceOperation;
 import com.github.milomarten.dice.operation.PoolOperation;
-import com.github.milomarten.dice.term.CoinFlipTerm;
-import com.github.milomarten.dice.term.DiceMathTerm;
-import com.github.milomarten.dice.term.NumberTerm;
-import com.github.milomarten.dice.term.PredicateTerm;
+import com.github.milomarten.dice.term.*;
 import com.github.milomarten.evaluator.EvaluatorOptions;
 import com.github.milomarten.evaluator.ExpressionEvaluator;
 import com.github.milomarten.evaluator.ExpressionSyntaxError;
@@ -26,10 +23,27 @@ public class DiceExpressionParser extends BasicExpressionParser<DiceMathTerm> {
     @Override
     protected DiceMathTerm stringToTerm(ShrinkingString string, EvaluatorOptions options) {
         var c = string.currentChar();
+
+        if (c == '@') {
+            var tokenMaybe = BasicExpressionParser.readToken(string, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_", '@');
+            if (tokenMaybe.isPresent()) {
+                var resolve = options.getTokenResolver().apply(tokenMaybe.get());
+                if (resolve.isPresent() && resolve.get() instanceof DiceMathTerm dmt) {
+                    return new TokenTerm(tokenMaybe.get(), dmt);
+                }
+            }
+        }
+
         var coinFlipMaybe = CoinFlipTerm.parse(c);
         if (coinFlipMaybe.isPresent()) {
             string.advance();
             return coinFlipMaybe.get();
+        }
+
+        var stringMaybe = BasicExpressionParser.readNextString(string, '"', '\\')
+                .or(() -> BasicExpressionParser.readNextString(string, '\'', '\\'));
+        if (stringMaybe.isPresent()) {
+            return new StringTerm(stringMaybe.get());
         }
 
         return BasicExpressionParser.readNextBigDecimal(string)

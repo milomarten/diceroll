@@ -19,6 +19,8 @@ public class DiceResultFormatter implements ExpressionFormatter<DiceMathTerm> {
             case ImplicitNumberTerm ignored -> "";
             case PredicateTerm pt -> pt.comparison().getSymbol() + formatTerm(pt.quantity());
             case AbstractPoolTerm pt -> pt.format(this);
+            case StringTerm st -> "\"" + st.value() + "\"";
+            case TokenTerm tt -> "@" + tt.name() + "=" + formatTerm(tt.wrapped());
         };
     }
 

@@ -3,7 +3,10 @@ package com.github.milomarten.parsing;
 import com.github.milomarten.evaluator.*;
 
 import java.math.BigDecimal;
+import java.text.CharacterIterator;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * The most basic of Expression Parsers, which delegate based on if a term is expected or not
@@ -115,6 +118,78 @@ public abstract class BasicExpressionParser<T extends Term> implements TermParse
         }
         return Optional.of(new BigDecimal(result));
     }
+
+    /**
+     * Pull the next String out of a ShrinkingString
+     * This method will advance the ShrinkingString until it reads a sequence of zero or more characters within
+     * two bounding characters. If the escape character is used before a bounding character, the bounding character
+     * is considered to be part of the string, and will proceed further until an unescaped bounding character is found.
+     * If the escape character is used before another escape character, the escape character is considered to be part
+     * of the string.
+     * <br>
+     * If any other character is after the escape character, an exception is thrown. If the ShrinkingString is
+     * fully consumed without reaching an ending boundingChar, an exception is thrown. If the ShrinkingString is
+     * not immediately at the boundingChar, an empty Optional is returned.
+     * @param string The ShrinkingString to parse
+     * @param boundingChar The character to use as both start and end of the string
+     * @param escapeChar The character to indicate that the subsequent letter should be read verbatim
+     * @return A String, if one could be parsed, or an empty Optional if it could not.
+     */
+    protected static Optional<String> readNextString(ShrinkingString string, char boundingChar, char escapeChar) {
+        if (string.currentChar() != boundingChar) {
+            return Optional.empty();
+        } else {
+            string.advance();
+        }
+
+        var s = new StringBuilder();
+        while (string.currentChar() != boundingChar && string.currentChar() != CharacterIterator.DONE) {
+            var currentChar = string.currentChar();
+            if (currentChar == escapeChar) {
+                string.advance();
+                currentChar = string.currentChar();
+                if (currentChar == escapeChar) {
+                    s.append(escapeChar);
+                    string.advance();
+                } else if (currentChar == boundingChar) {
+                    s.append(boundingChar);
+                    string.advance();
+                } else {
+                    throw new ExpressionSyntaxError("Unknown escape sequence: " + escapeChar + currentChar);
+                }
+            } else {
+                s.append(currentChar);
+                string.advance();
+            }
+        }
+
+        if (string.currentChar() == boundingChar) {
+            string.advance();
+            return Optional.of(s.toString());
+        } else {
+            throw new ExpressionSyntaxError("Unbounded string");
+        }
+    }
+
+    protected static Optional<String> readToken(ShrinkingString string, String validChars, char startChar) {
+        if (string.currentChar() != startChar) {
+            return Optional.empty();
+        }
+        string.advance();
+
+        StringBuilder sb = new StringBuilder();
+        var validCharSet = validChars.chars().boxed().collect(Collectors.toSet());
+        while (string.currentChar() != CharacterIterator.DONE && validCharSet.contains((int) string.currentChar())) {
+            sb.append(string.currentChar());
+            string.advance();
+        }
+
+        if (sb.isEmpty()) {
+            throw new ExpressionSyntaxError("Token must be at least one character");
+        }
+        return Optional.of(sb.toString());
+    }
+
 
     private static boolean isNumberFriendlyCharacter(char c) {
         return isNumber(c) || c == '.' || isSignCharacter(c);
