@@ -45,6 +45,12 @@ public sealed interface DiceMathTerm extends Term permits AbstractPoolTerm, Coin
     }
 
     /**
+     * Convert this term into a String
+     * @return This term, expressed as a string.
+     */
+    String asString();
+
+    /**
      * Add this term to another.
      * By default, this and the other term are coerced into numbers, added together, and returned
      * as a new NumberTerm.

@@ -1,5 +1,7 @@
 package com.github.milomarten.dice.term;
 
+import com.github.milomarten.evaluator.ExpressionSyntaxError;
+
 import java.math.BigDecimal;
 
 /**
@@ -17,4 +19,8 @@ public record NumberTerm(BigDecimal number) implements DiceMathTerm {
         return true;
     }
 
+    @Override
+    public String asString() {
+        return number.toPlainString();
+    }
 }

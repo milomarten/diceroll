@@ -4,7 +4,6 @@ import com.github.milomarten.dice.die.MarkedRoll;
 import com.github.milomarten.evaluator.EvaluatorOptions;
 
 import java.util.List;
-import java.util.function.BinaryOperator;
 import java.util.function.UnaryOperator;
 
 public final class PoolTerm extends AbstractPoolTerm {

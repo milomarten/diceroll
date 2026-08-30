@@ -32,6 +32,12 @@ public enum CoinFlipTerm implements DiceMathTerm {
         return false;
     }
 
+    @Override
+    public String asString() {
+        return letter;
+    }
+
+
     public static Optional<CoinFlipTerm> parse(char c) {
         return Arrays.stream(values())
                 .filter(cft -> cft.letter.charAt(0) == c)

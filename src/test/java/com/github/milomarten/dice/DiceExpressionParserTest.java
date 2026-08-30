@@ -16,19 +16,11 @@ class DiceExpressionParserTest {
 
     @Test
     public void test() {
-        var expr = "3d@ten";
-        var result = EVAL.evaluate(expr, eo());
+        var expr = "d{'ONE', 'TWO'}+2";
+        var result = EVAL.evaluate(expr);
         var formatted = LineByLineFormatter.format(result, new DiceResultFormatter());
 
         System.out.println(expr);
         formatted.forEach(line -> System.out.println("- " + line));
-    }
-
-    private EvaluatorOptions eo() {
-        return EvaluatorOptions.builder()
-                .tokenResolver((token) -> {
-                   return Optional.of(new NumberTerm(BigDecimal.TEN));
-                })
-                .build();
     }
 }

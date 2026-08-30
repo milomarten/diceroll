@@ -1,5 +1,7 @@
 package com.github.milomarten.dice.term;
 
+import com.github.milomarten.evaluator.ExpressionSyntaxError;
+
 import java.math.BigDecimal;
 
 /**
@@ -15,11 +17,16 @@ public record PlaceholderTerm() implements DiceMathTerm {
 
     @Override
     public BigDecimal asNumber() {
-        throw new UnsupportedOperationException("Tried to unwrap a placeholder term as a number");
+        throw new ExpressionSyntaxError("Tried to unwrap a placeholder term as a number");
     }
 
     @Override
     public boolean isNumber() {
         return false;
+    }
+
+    @Override
+    public String asString() {
+        throw new ExpressionSyntaxError("Tried to unwrap a placeholder term as a string");
     }
 }

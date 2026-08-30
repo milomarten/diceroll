@@ -1,5 +1,6 @@
 package com.github.milomarten.dice.term;
 
+import com.github.milomarten.evaluator.ExpressionSyntaxError;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -44,11 +45,16 @@ public record PredicateTerm(Comparison comparison, DiceMathTerm quantity) implem
 
     @Override
     public BigDecimal asNumber() {
-        throw new UnsupportedOperationException("Tried to unwrap a predicate as a number");
+        throw new ExpressionSyntaxError("Tried to unwrap a predicate as a number");
     }
 
     @Override
     public boolean isNumber() {
         return false;
+    }
+
+    @Override
+    public String asString() {
+        throw new ExpressionSyntaxError("Tried to unwrap a predicate as a string");
     }
 }

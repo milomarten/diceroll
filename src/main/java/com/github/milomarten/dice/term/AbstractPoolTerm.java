@@ -72,6 +72,21 @@ public sealed class AbstractPoolTerm implements DiceMathTerm permits DieResultTe
         return totalingStrategy.isNumber(this.pool);
     }
 
+    public DiceMathTerm getSingleTermIfSingleTerm() {
+        var value = pool.stream()
+                .filter(m -> !m.dropped)
+                .toList();
+        if (value.size() == 1) {
+            return value.getFirst().roll;
+        }
+        throw new ExpressionSyntaxError("Expected a pool of only one element");
+    }
+
+    @Override
+    public String asString() {
+        return getSingleTermIfSingleTerm().asString();
+    }
+
     protected List<MarkedRoll<DiceMathTerm>> copyPool() {
         return pool.stream()
                 .map(mr -> new MarkedRoll<>(mr.roll, mr.dropped, mr.exploded))
@@ -83,6 +98,24 @@ public sealed class AbstractPoolTerm implements DiceMathTerm permits DieResultTe
             boolean canDropOrKeep,
             TotalingStrategy<DiceMathTerm> totalingStrategy) {
         return new AbstractPoolTerm(pool, canDropOrKeep, totalingStrategy);
+    }
+
+    @Override
+    public DiceMathTerm add(DiceMathTerm addend, EvaluatorOptions options) {
+        if (isNumber()) {
+            return DiceMathTerm.super.add(addend, options);
+        } else {
+            return getSingleTermIfSingleTerm().add(addend, options);
+        }
+    }
+
+    @Override
+    public DiceMathTerm multiply(DiceMathTerm multiplier, EvaluatorOptions options) {
+        if (isNumber()) {
+            return DiceMathTerm.super.multiply(multiplier, options);
+        } else {
+            return getSingleTermIfSingleTerm().multiply(multiplier, options);
+        }
     }
 
     @Override

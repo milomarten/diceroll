@@ -23,4 +23,8 @@ public record ImplicitNumberTerm(BigDecimal number) implements DiceMathTerm {
         return true;
     }
 
+    @Override
+    public String asString() {
+        return number.toPlainString();
+    }
 }

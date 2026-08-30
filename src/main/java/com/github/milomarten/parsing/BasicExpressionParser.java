@@ -171,15 +171,14 @@ public abstract class BasicExpressionParser<T extends Term> implements TermParse
         }
     }
 
-    protected static Optional<String> readToken(ShrinkingString string, String validChars, char startChar) {
+    protected static Optional<String> readToken(ShrinkingString string, Set<Integer> validChars, char startChar) {
         if (string.currentChar() != startChar) {
             return Optional.empty();
         }
         string.advance();
 
         StringBuilder sb = new StringBuilder();
-        var validCharSet = validChars.chars().boxed().collect(Collectors.toSet());
-        while (string.currentChar() != CharacterIterator.DONE && validCharSet.contains((int) string.currentChar())) {
+        while (string.currentChar() != CharacterIterator.DONE && validChars.contains((int) string.currentChar())) {
             sb.append(string.currentChar());
             string.advance();
         }

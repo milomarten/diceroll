@@ -9,23 +9,33 @@ import com.github.milomarten.evaluator.ExpressionSyntaxError;
 import com.github.milomarten.parsing.BasicExpressionParser;
 import com.github.milomarten.parsing.ShrinkingString;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
 /**
  * A parser for parsing diceroll strings
  * Terms supported:
  * - any decimal number,
  * - the letters C, H, and T (which represent coin flips)
  * - The characters =, &lt;, and &gt;, followed by a number, which represents a predicate
+ * - Any letters between double- or single-quotes, representing a generic string. Backslash is used as an escape character
+ * - An @ followed by any Latin letter (upper- or lowercase or an underscore), representing a Token
  * Operations supported:
  * - Bounded Operator &#123;&#125;, for constructing Pools
  * - All Operators found in DiceOperation
  */
 public class DiceExpressionParser extends BasicExpressionParser<DiceMathTerm> {
+    public static final Set<Integer> TOKEN_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_"
+            .chars()
+            .boxed()
+            .collect(Collectors.toSet());
+
     @Override
     protected DiceMathTerm stringToTerm(ShrinkingString string, EvaluatorOptions options) {
         var c = string.currentChar();
 
         if (c == '@') {
-            var tokenMaybe = BasicExpressionParser.readToken(string, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_", '@');
+            var tokenMaybe = BasicExpressionParser.readToken(string, TOKEN_CHARS, '@');
             if (tokenMaybe.isPresent()) {
                 var resolve = options.getTokenResolver().apply(tokenMaybe.get());
                 if (resolve.isPresent() && resolve.get() instanceof DiceMathTerm dmt) {
