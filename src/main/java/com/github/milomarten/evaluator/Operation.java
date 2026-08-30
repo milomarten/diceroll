@@ -42,4 +42,12 @@ public interface Operation<T extends Term> {
     default T getImplicitLeftTerm() {
         return null;
     }
+
+    /**
+     * Check if this operation expects a term after it or not
+     * This should return true for binary operators, but false for postfix
+     * operations
+     * @return True if a term should follow this operation, false otherwise.
+     */
+    default boolean expectTermAfter() { return true; }
 }

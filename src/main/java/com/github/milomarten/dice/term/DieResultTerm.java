@@ -139,6 +139,14 @@ public final class DieResultTerm extends AbstractPoolTerm {
     }
 
     @Override
+    protected Predicate<MarkedRoll<DiceMathTerm>> parseTermIntoPredicate(DiceMathTerm predicate, EvaluatorOptions options) {
+        if (predicate instanceof PlaceholderTerm) {
+            return roll -> Objects.equals(roll.roll, die.getMaxValue(options));
+        }
+        return super.parseTermIntoPredicate(predicate, options);
+    }
+
+    @Override
     public String format(ExpressionFormatter<DiceMathTerm> f) {
         return "\uD83C\uDFB2" + super.format(f);
     }

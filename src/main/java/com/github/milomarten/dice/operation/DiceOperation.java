@@ -194,90 +194,187 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
     },
     /**
      * Explode the dice in a roll.
-     * Of the dice that were rolled, any matching a certain predicate will cause another dice to be rolled. This continues
+     * Of the dice that were rolled, any equal to the maximum dice roll will roll another dice. This continues
      * until no more dice match the predicate. To avoid abuse, the explosion limit is 20, at which point no
      * more explosions occur regardless of matching.
-     * The left side must be a dice roll. The right side can be any of the following:
-     * 1. If no predicate is provided, the highest dice value will explode. This will fail iff any dice face is non-numeric
-     * 2. >[number] will explode any dice greater than or equal to number. This will fail iff any dice face is non-numeric
-     * 3. <[number] will explode any dice less than or equal to number. This will fail iff any dice face is non-numeric
-     * 4. =[number] will explode any dice equal to value. This will fail iff any dice face is non-numeric
-     * 5. If a pool is provided, the dice will explode if any match a value in the pool. This will always work.
-     * 6. In any other case, the dice will explode if it equals() the term provided. This will always work.
-     * If the right side is omitted, highest dice value is assumed.
+     * This fails if the dice does not have a "max" term
      */
-    EXPLODE("!", 4) {
+    EXPLODE_MAX("!", 4) {
+        @Override
+        public ValueAndExpression<DiceMathTerm> evaluate(TermStack<DiceMathTerm> termStack, EvaluatorOptions options) {
+            var one = DiceOperation.pull(termStack, "dice pool");
+            var total = one.value().explode(PlaceholderTerm.INSTANCE, options);
+
+            return new ValueAndExpression<>(total, this, List.of(one, new ValueAndExpression<>(PlaceholderTerm.INSTANCE)));
+        }
+
+        @Override
+        public boolean expectTermAfter() {
+            return false;
+        }
+    },
+    /**
+     * Explode the dice in a roll.
+     * Of the dice that were rolled, any equal to the second term will roll another dice. This continues
+     * until no more dice match the predicate. To avoid abuse, the explosion limit is 20, at which point no
+     * more explosions occur regardless of matching.
+     */
+    EXPLODE_EQUAL("!=", 4) {
         @Override
         public ValueAndExpression<DiceMathTerm> evaluate(TermStack<DiceMathTerm> termStack, EvaluatorOptions options) {
             return evaluateTwoParameterFunc(termStack, options, "dice pool", "explosion predicate",
-                    (one, two, opts) -> one.explode(two, options));
+                    (one, two, opts) -> {
+                return one.explode(new PredicateTerm(PredicateTerm.Comparison.EQUAL, two), options);
+            });
+        }
+    },
+    /**
+     * Explode the dice in a roll.
+     * Of the dice that were rolled, any greater than or equal to the second term will roll another dice. This continues
+     * until no more dice match the predicate. To avoid abuse, the explosion limit is 20, at which point no
+     * more explosions occur regardless of matching.
+     * This will fail if either side of the term is non-numeric.
+     */
+    EXPLODE_GTE("!>", 4) {
+        @Override
+        public ValueAndExpression<DiceMathTerm> evaluate(TermStack<DiceMathTerm> termStack, EvaluatorOptions options) {
+            return evaluateTwoParameterFunc(termStack, options, "dice pool", "explosion predicate",
+                    (one, two, opts) -> {
+                        return one.explode(new PredicateTerm(PredicateTerm.Comparison.GTE, two), options);
+                    });
+        }
+    },
+    /**
+     * Explode the dice in a roll.
+     * Of the dice that were rolled, any less than or equal to the second term will roll another dice. This continues
+     * until no more dice match the predicate. To avoid abuse, the explosion limit is 20, at which point no
+     * more explosions occur regardless of matching.
+     * This will fail if either side of the term is non-numeric.
+     */
+    EXPLODE_LTE("!<", 4) {
+        @Override
+        public ValueAndExpression<DiceMathTerm> evaluate(TermStack<DiceMathTerm> termStack, EvaluatorOptions options) {
+            return evaluateTwoParameterFunc(termStack, options, "dice pool", "explosion predicate",
+                    (one, two, opts) -> {
+                        return one.explode(new PredicateTerm(PredicateTerm.Comparison.LTE, two), options);
+                    });
         }
     },
     /**
      * Reroll the dice in a roll.
-     * Of the dice that were rolled, any matching a certain predicate will be dropped and rolled again. This continues
-     * until no more dice match the predicate. To avoid abuse, the explosion limit is 20, at which point no
+     * Of the dice that were rolled, any that are equal to the second term will be dropped and rolled again. This continues
+     * until no more dice match the predicate. To avoid abuse, the reroll limit is 20, at which point no
      * more rerolls occur regardless of matching.
-     * The left side must be a dice roll. The right side can be any of the following:
-     * 2. >[number] will reroll any dice greater than or equal to number. This will fail iff any dice face is non-numeric
-     * 3. <[number] will reroll any dice less than or equal to number. This will fail iff any dice face is non-numeric
-     * 4. =[number] will reroll any dice equal to value. This will fail iff any dice face is non-numeric
-     * 5. If a pool is provided, the dice will reroll if any match a value in the pool. This will always work.
-     * 6. In any other case, the dice will reroll if it equals() the term provided. This will always work.
      */
-    REROLL("r", 4) {
+    REROLL_EQUAL("r=", 4) {
         @Override
         public ValueAndExpression<DiceMathTerm> evaluate(TermStack<DiceMathTerm> termStack, EvaluatorOptions options) {
             return evaluateTwoParameterFunc(termStack, options, "dice pool", "reroll predicate",
-                    (one, two, opts) -> one.reroll(two, options));
+                    (one, two, opts) -> one.reroll(new PredicateTerm(PredicateTerm.Comparison.EQUAL, two), options));
         }
     },
     /**
-     * Reroll the dice in a roll, but only once.
-     * This is identical to REROLL, but only one iteration of rerolling occurs. All the same restrictions apply
-     * otherwise.
+     * Reroll the dice in a roll.
+     * Of the dice that were rolled, any that are greater than or equal to the second term will be dropped and rolled again. This continues
+     * until no more dice match the predicate. To avoid abuse, the reroll limit is 20, at which point no
+     * more rerolls occur regardless of matching.
+     * This will fail if either side of the term is non-numeric.
      */
-    REROLL_ONCE("ro", 4) {
+    REROLL_GTE("r>", 4) {
         @Override
         public ValueAndExpression<DiceMathTerm> evaluate(TermStack<DiceMathTerm> termStack, EvaluatorOptions options) {
             return evaluateTwoParameterFunc(termStack, options, "dice pool", "reroll predicate",
-                    (one, two, opts) -> one.rerollOnce(two, options));
+                    (one, two, opts) -> one.reroll(new PredicateTerm(PredicateTerm.Comparison.GTE, two), options));
+        }
+    },
+    /**
+     * Reroll the dice in a roll.
+     * Of the dice that were rolled, any that are less than or equal to the second term will be dropped and rolled again. This continues
+     * until no more dice match the predicate. To avoid abuse, the reroll limit is 20, at which point no
+     * more rerolls occur regardless of matching.
+     * This will fail if either side of the term is non-numeric.
+     */
+    REROLL_LTE("r<", 4) {
+        @Override
+        public ValueAndExpression<DiceMathTerm> evaluate(TermStack<DiceMathTerm> termStack, EvaluatorOptions options) {
+            return evaluateTwoParameterFunc(termStack, options, "dice pool", "reroll predicate",
+                    (one, two, opts) -> one.reroll(new PredicateTerm(PredicateTerm.Comparison.LTE, two), options));
         }
     },
     /**
      * Switch to counting mode
-     * The dice roll or pool is switched to a counting mode, which counts elements matching a certain predicate.
-     * The right side can be any of the following:
-     * 2. >[number] will count any dice greater than or equal to number. This will fail iff any dice face is non-numeric
-     * 3. <[number] will count any dice less than or equal to number. This will fail iff any dice face is non-numeric
-     * 4. =[number] will count any dice equal to value. This will fail iff any dice face is non-numeric
-     * 5. If a pool is provided, the dice will count if any match a value in the pool. This will always work.
-     * 6. In any other case, the dice will count if it equals() the term provided. This will always work.
+     * The dice roll or pool is switched to a counting mode, which counts elements equal to the second term
      */
-    TARGET_SUCCESS("s", 4) {
+    TARGET_SUCCESS_EQUAL("s=", 4) {
         @Override
         public ValueAndExpression<DiceMathTerm> evaluate(TermStack<DiceMathTerm> termStack, EvaluatorOptions options) {
             return evaluateTwoParameterFunc(termStack, options, "pool", "success predicate",
-                    (one, two, opts) -> one.targetSuccess(two, options));
+                    (one, two, opts) -> one.targetSuccess(new PredicateTerm(PredicateTerm.Comparison.EQUAL, two), options));
+        }
+    },
+    /**
+     * Switch to counting mode
+     * The dice roll or pool is switched to a counting mode, which counts elements greater than or equal to the second term
+     * This will fail if either side of the term is non-numeric.
+     */
+    TARGET_SUCCESS_GTE("s>", 4) {
+        @Override
+        public ValueAndExpression<DiceMathTerm> evaluate(TermStack<DiceMathTerm> termStack, EvaluatorOptions options) {
+            return evaluateTwoParameterFunc(termStack, options, "pool", "success predicate",
+                    (one, two, opts) -> one.targetSuccess(new PredicateTerm(PredicateTerm.Comparison.GTE, two), options));
+        }
+    },
+    /**
+     * Switch to counting mode
+     * The dice roll or pool is switched to a counting mode, which counts elements less than or equal to the second term
+     * This will fail if either side of the term is non-numeric.
+     */
+    TARGET_SUCCESS_LTE("s<", 4) {
+        @Override
+        public ValueAndExpression<DiceMathTerm> evaluate(TermStack<DiceMathTerm> termStack, EvaluatorOptions options) {
+            return evaluateTwoParameterFunc(termStack, options, "pool", "success predicate",
+                    (one, two, opts) -> one.targetSuccess(new PredicateTerm(PredicateTerm.Comparison.LTE, two), options));
         }
     },
     /**
      * Add a failure mode to counting
-     * The dice roll or pool in counting mode is given a failure predicate, which subtracts 1 if matches. If an element
-     * matches both success and failure predicates, they are negated and it counts for 0. The dice roll or pool MUST
+     * The dice roll or pool in counting mode will subtract 1 for every entry equal to the second term.
+     * The dice roll or pool MUST
      * be in counting mode already by using TARGET_SUCCESS.
-     * The right side can be any of the following:
-     * 2. >[number] will count any dice greater than or equal to number. This will fail iff any dice face is non-numeric
-     * 3. <[number] will count any dice less than or equal to number. This will fail iff any dice face is non-numeric
-     * 4. =[number] will count any dice equal to value. This will fail iff any dice face is non-numeric
-     * 5. If a pool is provided, the dice will count if any match a value in the pool. This will always work.
-     * 6. In any other case, the dice will count if it equals() the term provided. This will always work.
      */
-    TARGET_FAILURE("f", 4) {
+    TARGET_FAILURE_EQUAL("f=", 4) {
         @Override
         public ValueAndExpression<DiceMathTerm> evaluate(TermStack<DiceMathTerm> termStack, EvaluatorOptions options) {
             return evaluateTwoParameterFunc(termStack, options, "pool", "failure predicate",
-                    (one, two, opts) -> one.targetFailure(two, options));
+                    (one, two, opts) -> one.targetFailure(new PredicateTerm(PredicateTerm.Comparison.EQUAL, two), options));
+        }
+    },
+    /**
+     * Add a failure mode to counting
+     * The dice roll or pool in counting mode will subtract 1 for every entry greater than or equal to the second term.
+     * The dice roll or pool MUST
+     * be in counting mode already by using TARGET_SUCCESS.
+     * This will fail if either side of the term is non-numeric.
+     */
+    TARGET_FAILURE_GTE("f>", 4) {
+        @Override
+        public ValueAndExpression<DiceMathTerm> evaluate(TermStack<DiceMathTerm> termStack, EvaluatorOptions options) {
+            return evaluateTwoParameterFunc(termStack, options, "pool", "failure predicate",
+                    (one, two, opts) -> one.targetFailure(new PredicateTerm(PredicateTerm.Comparison.GTE, two), options));
+        }
+    },
+    /**
+     * Add a failure mode to counting
+     * The dice roll or pool in counting mode will subtract 1 for every entry less than or equal to the second term.
+     * The dice roll or pool MUST
+     * be in counting mode already by using TARGET_SUCCESS.
+     * This will fail if either side of the term is non-numeric.
+     */
+    TARGET_FAILURE_LTE("f<", 4) {
+        @Override
+        public ValueAndExpression<DiceMathTerm> evaluate(TermStack<DiceMathTerm> termStack, EvaluatorOptions options) {
+            return evaluateTwoParameterFunc(termStack, options, "pool", "failure predicate",
+                    (one, two, opts) -> one.targetFailure(new PredicateTerm(PredicateTerm.Comparison.LTE, two), options));
         }
     }
     ;

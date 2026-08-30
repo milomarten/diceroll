@@ -180,13 +180,28 @@ public sealed class AbstractPoolTerm implements DiceMathTerm permits DieResultTe
     }
 
     protected Predicate<MarkedRoll<DiceMathTerm>> parseTermIntoPredicate(DiceMathTerm predicate, EvaluatorOptions options) {
-        return switch (predicate) {
-            case PredicateTerm pt -> pt.asObjBigDecimalPredicate(mr -> mr.roll.asNumber());
-            case AbstractPoolTerm pt -> roll -> pt.getPool().stream()
-                    .filter(mr -> !mr.dropped)
-                    .anyMatch(mr -> Objects.equals(roll.roll, mr.roll));
-            default -> roll -> Objects.equals(roll.roll, predicate);
-        };
+        if (predicate instanceof PredicateTerm pred) {
+            if (pred.comparison() == PredicateTerm.Comparison.EQUAL) {
+                if (pred.quantity() instanceof PoolTerm pt) {
+                    return roll -> pt.getPool().stream()
+                            .filter(mr -> !mr.dropped)
+                            .anyMatch(mr -> {
+                                if (mr.roll.isNumber() && roll.roll.isNumber()) {
+                                    return Objects.equals(roll.roll.asNumber(), mr.roll.asNumber());
+                                } else {
+                                    return Objects.equals(roll.roll, mr.roll);
+                                }
+                            });
+                } else if (pred.quantity().isNumber()) {
+                    return roll -> Objects.equals(pred.quantity().asNumber(), roll.roll.asNumber());
+                } else {
+                    return roll -> Objects.equals(pred.quantity(), roll.roll);
+                }
+            } else {
+                return pred.asObjBigDecimalPredicate(mr -> mr.roll.asNumber());
+            }
+        }
+        throw new ExpressionSyntaxError("Expected predicate");
     }
 
     public String format(ExpressionFormatter<DiceMathTerm> f) {

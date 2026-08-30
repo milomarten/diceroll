@@ -73,7 +73,7 @@ public class ExpressionEvaluator<T extends Term> {
         }
 
         operators.push(new OperationWrapper<>(operator));
-        expectingTerm = true;
+        expectingTerm = operator.expectTermAfter();
     }
 
     /**

@@ -21,23 +21,14 @@ import java.util.function.Predicate;
 public record PredicateTerm(Comparison comparison, DiceMathTerm quantity) implements DiceMathTerm {
     @RequiredArgsConstructor
     public enum Comparison {
-        LE("<"), GTE(">"), EQUAL("=");
+        LTE("<"), GTE(">"), EQUAL("=");
 
         @Getter private final String symbol;
-
-        public static Comparison read(char c) {
-            return switch (c) {
-                case '<' -> LE;
-                case '>' -> GTE;
-                case '=' -> EQUAL;
-                default -> throw new IllegalArgumentException("" + c);
-            };
-        }
     }
 
     public <T> Predicate<T> asObjBigDecimalPredicate(Function<T, BigDecimal> mapper) {
         return switch (this.comparison) {
-            case LE -> t -> mapper.apply(t).compareTo(quantity.asNumber()) <= 0;
+            case LTE -> t -> mapper.apply(t).compareTo(quantity.asNumber()) <= 0;
             case GTE -> t -> mapper.apply(t).compareTo(quantity.asNumber()) >= 0;
             case EQUAL -> t -> Objects.equals(t, quantity);
         };

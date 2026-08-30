@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
  * Terms supported:
  * - any decimal number,
  * - the letters C, H, and T (which represent coin flips)
- * - The characters =, &lt;, and &gt;, followed by a number, which represents a predicate
  * - Any letters between double- or single-quotes, representing a generic string. Backslash is used as an escape character
  * - An @ followed by any Latin letter (upper- or lowercase or an underscore), representing a Token
  * Operations supported:
@@ -64,13 +63,7 @@ public class DiceExpressionParser extends BasicExpressionParser<DiceMathTerm> {
     @Override
     protected void handleNonTerm(ShrinkingString string, EvaluatorOptions options, ExpressionEvaluator<DiceMathTerm> evaluator) {
         var c = string.currentChar();
-        if (c == '=' || c == '<' || c == '>') {
-            var comp = PredicateTerm.Comparison.read(c);
-            string.advance();
-            var number = BasicExpressionParser.readNextBigDecimal(string);
-
-            evaluator.push(new PredicateTerm(comp, new NumberTerm(number.orElseThrow(() -> new ExpressionSyntaxError("Predicate without number after it")))));
-        } else if (c == '{') {
+        if (c == '{') {
             evaluator.pushBoundedOperationStart(PoolOperation.INSTANCE);
             string.advance();
         } else if (c == '}') {
