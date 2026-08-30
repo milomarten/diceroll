@@ -56,11 +56,7 @@ public class ExpressionEvaluator<T extends Term> {
     public void push(Operation<T> operator) {
         if (expectingTerm) {
             var leftTerm = operator.getImplicitLeftTerm();
-            var previousOperation = operators.isEmpty() ? null : operators.peek();
-            var rightTerm = (previousOperation != null && previousOperation.isOperation()) ? previousOperation.getOperation().getImplicitRightTerm() : null;
-            if (rightTerm != null) {
-                this.terms.pushInternal(new ValueAndExpression<>(rightTerm));
-            } else if (leftTerm != null) {
+            if (leftTerm != null) {
                 this.terms.pushInternal(new ValueAndExpression<>(leftTerm));
             } else {
                 throw new ExpressionSyntaxError("Missing term for operator " + operator);
@@ -104,16 +100,6 @@ public class ExpressionEvaluator<T extends Term> {
      * @param right The right-bound character.
      */
     public void pushBoundedOperationEnd(String right) {
-        if (expectingTerm) {
-            var previousOperation = operators.isEmpty() ? null : operators.peek();
-            var rightTerm = (previousOperation != null && previousOperation.isOperation()) ? previousOperation.getOperation().getImplicitRightTerm() : null;
-            if (rightTerm == null) {
-                throw new ExpressionSyntaxError("Unfinished operation");
-            } else {
-                this.terms.pushInternal(new ValueAndExpression<>(rightTerm));
-            }
-        }
-
         Operation<T> underneath;
         while (!operators.isEmpty() &&
                 operators.peek().isOperation()) {
@@ -141,16 +127,6 @@ public class ExpressionEvaluator<T extends Term> {
      * @return The result of evaluating the Expression
      */
     public ValueAndExpression<T> finish() {
-        if (expectingTerm) {
-            var previousOperation = operators.isEmpty() ? null : operators.peek();
-            var rightTerm = (previousOperation != null && previousOperation.isOperation()) ? previousOperation.getOperation().getImplicitRightTerm() : null;
-            if (rightTerm == null) {
-                throw new ExpressionSyntaxError("Unfinished operation");
-            } else {
-                this.terms.pushInternal(new ValueAndExpression<>(rightTerm));
-            }
-        }
-
         while(!operators.isEmpty()) {
             var op = operators.pop().getOperation();
             if (op == null) {

@@ -16,7 +16,7 @@ class DiceExpressionParserTest {
 
     @Test
     public void test() {
-        var expr = "d{'ONE', 'TWO'}+2";
+        var expr = "({2d10, 3d5}kh1) + 2";
         var result = EVAL.evaluate(expr);
         var formatted = LineByLineFormatter.format(result, new DiceResultFormatter());
 

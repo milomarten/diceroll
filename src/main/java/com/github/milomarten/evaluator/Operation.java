@@ -42,8 +42,4 @@ public interface Operation<T extends Term> {
     default T getImplicitLeftTerm() {
         return null;
     }
-
-    default T getImplicitRightTerm() {
-        return null;
-    }
 }

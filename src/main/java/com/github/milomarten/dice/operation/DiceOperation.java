@@ -149,11 +149,6 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
             return evaluateTwoParameterFunc(termStack, options, "pool", "num to drop",
                     (one, two, opts) -> one.drop(true, two, options));
         }
-
-        @Override
-        public DiceMathTerm getImplicitRightTerm() {
-            return ImplicitNumberTerm.ONE;
-        }
     },
     /**
      * Drop the highest n elements in a roll or pool.
@@ -167,11 +162,6 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
         public ValueAndExpression<DiceMathTerm> evaluate(TermStack<DiceMathTerm> termStack, EvaluatorOptions options) {
             return evaluateTwoParameterFunc(termStack, options, "pool", "num to drop",
                     (one, two, opts) -> one.drop(false, two, options));
-        }
-
-        @Override
-        public DiceMathTerm getImplicitRightTerm() {
-            return ImplicitNumberTerm.ONE;
         }
     },
     /**
@@ -187,11 +177,6 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
             return evaluateTwoParameterFunc(termStack, options, "pool", "num to keep",
                     (one, two, opts) -> one.keep(true, two, options));
         }
-
-        @Override
-        public DiceMathTerm getImplicitRightTerm() {
-            return ImplicitNumberTerm.ONE;
-        }
     },
     /**
      * Keep the highest n elements in a roll or pool.
@@ -205,11 +190,6 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
         public ValueAndExpression<DiceMathTerm> evaluate(TermStack<DiceMathTerm> termStack, EvaluatorOptions options) {
             return evaluateTwoParameterFunc(termStack, options, "pool", "num to keep",
                     (one, two, opts) -> one.keep(false, two, options));
-        }
-
-        @Override
-        public DiceMathTerm getImplicitRightTerm() {
-            return ImplicitNumberTerm.ONE;
         }
     },
     /**
@@ -231,11 +211,6 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
         public ValueAndExpression<DiceMathTerm> evaluate(TermStack<DiceMathTerm> termStack, EvaluatorOptions options) {
             return evaluateTwoParameterFunc(termStack, options, "dice pool", "explosion predicate",
                     (one, two, opts) -> one.explode(two, options));
-        }
-
-        @Override
-        public DiceMathTerm getImplicitRightTerm() {
-            return PlaceholderTerm.INSTANCE;
         }
     },
     /**
