@@ -44,6 +44,12 @@ public class ShrinkingString {
         this.index += qty;
     }
 
+    public void consumeBlankSpaces() {
+        while(Character.isSpaceChar(currentChar())) {
+            advance();
+        }
+    }
+
     /**
      * Check if this string is empty
      * @return True if there is no more characters available to consume

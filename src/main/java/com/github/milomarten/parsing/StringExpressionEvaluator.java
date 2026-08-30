@@ -6,6 +6,7 @@ import com.github.milomarten.evaluator.Term;
 import com.github.milomarten.evaluator.ValueAndExpression;
 import lombok.RequiredArgsConstructor;
 
+import java.text.CharacterIterator;
 import java.util.regex.Pattern;
 
 /**
@@ -25,10 +26,13 @@ public class StringExpressionEvaluator<T extends Term> {
 
     public ValueAndExpression<T> evaluate(String expression, EvaluatorOptions options) {
         var evaluator = new ExpressionEvaluator<T>(options);
-        var string = new ShrinkingString(SPACES.matcher(expression).replaceAll(""));
+        var string = new ShrinkingString(expression);
 
         do {
-            parser.parseNextToken(string, options, evaluator);
+            string.consumeBlankSpaces();
+            if (string.currentChar() != CharacterIterator.DONE) {
+                parser.parseNextToken(string, options, evaluator);
+            }
         } while (!string.isEmpty());
 
         return evaluator.finish();

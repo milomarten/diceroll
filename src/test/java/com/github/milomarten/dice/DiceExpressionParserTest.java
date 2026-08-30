@@ -16,7 +16,7 @@ class DiceExpressionParserTest {
 
     @Test
     public void test() {
-        var expr = "5d10s>8";
+        var expr = "8 + 4 ";
         var result = EVAL.evaluate(expr);
         var formatted = LineByLineFormatter.format(result, new DiceResultFormatter());
 
