@@ -12,6 +12,8 @@ import lombok.ToString;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.github.milomarten.dice.term.TokenTerm.TOKEN_RESOLVE_OPERATION;
+
 /**
  * A Node class used for facilitating the LineByLineFormatter.
  * This node contains two operations which, in tandem, give an output for each step of an Evaluation.
@@ -49,6 +51,8 @@ class UnNode<T extends Term> {
                 string = formatter.formatOperation((Operation<T>) o, children.stream().map(UnNode::getString).toList());
             } else if (value.operation() instanceof BoundedOperation<?> bo) {
                 string = formatter.formatBoundedOperation((BoundedOperation<T>) bo, children.stream().map(UnNode::getString).toList());
+            } else if (TOKEN_RESOLVE_OPERATION.equals(value.operation())) {
+                string = formatter.formatTerm(value.children().getFirst().value());
             }
         }
     }

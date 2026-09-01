@@ -36,10 +36,8 @@ public class DiceExpressionParser extends BasicExpressionParser<DiceMathTerm> {
         if (c == '@') {
             var tokenMaybe = BasicExpressionParser.readToken(string, TOKEN_CHARS, '@');
             if (tokenMaybe.isPresent()) {
-                var resolve = options.getTokenResolver().apply(tokenMaybe.get());
-                if (resolve.isPresent() && resolve.get() instanceof DiceMathTerm dmt) {
-                    return new TokenTerm(tokenMaybe.get(), dmt);
-                }
+                return (DiceMathTerm) options.getTokenResolver().apply(tokenMaybe.get())
+                        .orElseThrow(() -> new ExpressionSyntaxError("Unknown token " + tokenMaybe.get()));
             }
         }
 

@@ -20,7 +20,8 @@ public class DiceResultFormatter implements ExpressionFormatter<DiceMathTerm> {
             case PredicateTerm pt -> pt.comparison().getSymbol() + formatTerm(pt.quantity());
             case AbstractPoolTerm pt -> pt.format(this);
             case StringTerm st -> "\"" + st.value() + "\"";
-            case TokenTerm tt -> "@" + tt.name() + "=" + formatTerm(tt.wrapped());
+            case TokenTerm tt -> "@" + tt.name();
+            case ResolvedTokenTerm rtt -> "@{" + rtt.name() + " -> " + formatTerm(rtt.wrapped()) + "}";
         };
     }
 
@@ -31,7 +32,7 @@ public class DiceResultFormatter implements ExpressionFormatter<DiceMathTerm> {
             return operatedTerms.stream()
                     .collect(Collectors.joining(symbol, "(", ")"));
         }
-        return "#";
+        return o.toString();
     }
 
     @Override

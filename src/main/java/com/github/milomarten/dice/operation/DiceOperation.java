@@ -7,6 +7,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.*;
+import java.util.function.BiFunction;
+
+import static com.github.milomarten.dice.term.TokenTerm.TOKEN_RESOLVE_OPERATION;
 
 /**
  * All standard Operations which are used in dicerolls.
@@ -118,14 +121,12 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
 
             var numDiceInt = numDice.value().asInteger(options);
 
-            Die<DiceMathTerm> die;
-            if (numSides.value() instanceof PoolTerm pool) {
-                die = new PoolDie(pool, options.getRandomSource());
-            } else if (numSides.value() instanceof CoinFlipTerm) {
-                die = new DiscreteDie(options.getRandomSource(), CoinFlipTerm.HEADS, CoinFlipTerm.TAILS);
-            } else {
-                die = new NDie(numSides.value().asInteger(options), options.getRandomSource());
-            }
+            Die<DiceMathTerm> die = switch (numSides.value()) {
+                case PoolTerm pool -> new PoolDie(pool, options.getRandomSource());
+                case CoinFlipTerm ignored -> new DiscreteDie(options.getRandomSource(), CoinFlipTerm.HEADS, CoinFlipTerm.TAILS);
+                case TokenTerm token -> new TokenDie(token);
+                default -> new NDie(numSides.value().asInteger(options), options.getRandomSource());
+            };
             var resultant = new DieResultTerm(die, numDice.value(), die.roll(numDiceInt, options));
 
             return new ValueAndExpression<>(resultant, this, List.of(numDice, numSides));
@@ -202,10 +203,8 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
     EXPLODE_MAX("!", 4) {
         @Override
         public ValueAndExpression<DiceMathTerm> evaluate(TermStack<DiceMathTerm> termStack, EvaluatorOptions options) {
-            var one = DiceOperation.pull(termStack, "dice pool");
-            var total = one.value().explode(PlaceholderTerm.INSTANCE, options);
-
-            return new ValueAndExpression<>(total, this, List.of(one, new ValueAndExpression<>(PlaceholderTerm.INSTANCE)));
+            return evaluateOneParameterFunc(termStack, options, "dice pool",
+                    (term, opts) -> term.explode(PlaceholderTerm.INSTANCE, options));
         }
 
         @Override
@@ -389,10 +388,29 @@ public enum DiceOperation implements Operation<DiceMathTerm> {
         return stack.pop();
     }
 
+    protected ValueAndExpression<DiceMathTerm> evaluateOneParameterFunc(TermStack<DiceMathTerm> stack, EvaluatorOptions options, String term,
+                                                                        BiFunction<DiceMathTerm, EvaluatorOptions, DiceMathTerm> operator) {
+        var one = DiceOperation.pull(stack, term);
+
+        if (one.value() instanceof TokenTerm tt) {
+            one = new ValueAndExpression<>(tt.resolve(), TOKEN_RESOLVE_OPERATION, List.of(one));
+        }
+
+        var total = operator.apply(one.value(), options);
+        return new ValueAndExpression<>(total, this, List.of(one));
+    }
+
     protected ValueAndExpression<DiceMathTerm> evaluateTwoParameterFunc(TermStack<DiceMathTerm> stack, EvaluatorOptions options, String firstTerm, String secondTerm,
                                                                         TermOperator<DiceMathTerm> operator) {
         var two = DiceOperation.pull(stack, secondTerm);
         var one = DiceOperation.pull(stack, firstTerm);
+
+        if (two.value() instanceof TokenTerm tt) {
+            two = new ValueAndExpression<>(tt.resolve(), TOKEN_RESOLVE_OPERATION, List.of(two));
+        }
+        if (one.value() instanceof TokenTerm tt) {
+            one = new ValueAndExpression<>(tt.resolve(), TOKEN_RESOLVE_OPERATION, List.of(one));
+        }
 
         var total = operator.compute(one.value(), two.value(), options);
         return new ValueAndExpression<>(total, this, List.of(one, two));

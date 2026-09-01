@@ -9,6 +9,10 @@ import java.math.BigDecimal;
  * @param number The number, as a BigDecimal
  */
 public record NumberTerm(BigDecimal number) implements DiceMathTerm {
+    public NumberTerm(int number) {
+        this(new BigDecimal(number));
+    }
+
     @Override
     public BigDecimal asNumber() {
         return number;
