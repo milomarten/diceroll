@@ -9,12 +9,10 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.apache.commons.rng.UniformRandomProvider;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 /**
  * A table of tokens in an easier format
@@ -64,6 +62,29 @@ public class TokenTable implements Function<String, Optional<Term>> {
      */
     public void addRandomlySelected(String name, RandomlySelected<? extends DiceMathTerm> table, UniformRandomProvider randomness) {
         this.terms.put(name, () -> new TokenTerm(name, () -> table.get(randomness)));
+    }
+
+    /**
+     * Copy every element from the provided table into this one
+     * Any duplicate keys will be related with the provided table's version
+     * @param table The table to add
+     */
+    public void addTable(TokenTable table) {
+        this.terms.putAll(table.terms);
+    }
+
+    /**
+     * Get all tokens in this table
+     * All tokens in this table are concatenated with those in their parent, recursively, removing duplicates.
+     * @return The collection of available tokens
+     */
+    public Collection<String> getTokens() {
+        var parentTokens = this.parent == null ? List.<String>of() : this.parent.getTokens();
+        var myTokens = this.terms.keySet();
+
+        return Stream.concat(myTokens.stream(), parentTokens.stream())
+                .distinct()
+                .toList();
     }
 
     @Override
